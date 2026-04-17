@@ -262,3 +262,37 @@ async function renderGeoTable(containerId) {
     });
   });
 }
+
+export async function renderVisitas(containerId) {
+  const el = document.getElementById(containerId);
+  if (!el) return;
+  try {
+    const r = await fetch('/api/visitas');
+    const data = await r.json();
+    const total = data.total || 0;
+    const top = data.countries || [];
+
+    const countryFlags = { PE: '🇵🇪', AR: '🇦🇷', CL: '🇨🇱', CO: '🇨🇴', EC: '🇪🇨', BR: '🇧🇷', US: '🇺🇸', ES: '🇪🇸', MX: '🇲🇽', VE: '🇻🇪', BO: '🇧🇴', CR: '🇨🇷', IT: '🇮🇹', FR: '🇫🇷', DE: '🇩🇪', GB: '🇬🇧', JP: '🇯🇵', CA: '🇨🇦', AU: '🇦🇺', XX: '🌐' };
+
+    el.innerHTML = `
+      <div class="visitas-widget">
+        <div class="visitas-count">
+          <span class="visitas-number">${total.toLocaleString('es-PE')}</span>
+          <span class="visitas-label">visitas</span>
+        </div>
+        ${top.length > 0 ? `
+          <div class="visitas-countries">
+            ${top.slice(0, 5).map(c => `
+              <div class="visitas-country">
+                <span class="visitas-flag">${countryFlags[c.code] || '🌐'}</span>
+                <span class="visitas-country-name">${c.name}</span>
+                <span class="visitas-country-count">${c.count.toLocaleString('es-PE')}</span>
+              </div>
+            `).join('')}
+          </div>
+        ` : ''}
+      </div>`;
+  } catch {
+    el.innerHTML = '';
+  }
+}

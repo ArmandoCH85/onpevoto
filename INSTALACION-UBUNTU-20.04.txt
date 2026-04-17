@@ -1,0 +1,219 @@
+# ONPE Voto - Instalacion en Ubuntu 20.04 + Dominio www.votoperu.site
+
+## 1. DNS - Apuntar dominio al servidor
+
+En el panel de tu proveedor de dominio (Cloudflare, Namecheap, GoDaddy, etc):
+
+- Crear registro A: www.votoperu.site → IP_DE_TU_SERVIDOR
+- Crear registro A: votoperu.site → IP_DE_TU_SERVIDOR (para redireccion)
+
+Verificar desde tu maquina local:
+  dig +short www.votoperu.site
+  # Debe devolver la IP de tu servidor
+
+## 2. Instalar Node.js 18+ (Ubuntu 20.04 trae Node 10, no sirve)
+
+  sudo apt update && sudo apt upgrade -y
+  curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
+  sudo apt install -y nodejs
+  node -v
+  # Debe mostrar v18.x o mayor
+
+## 3. Instalar Git y clonar el repo
+
+  sudo apt install -y git
+  cd /opt
+  sudo git clone https://github.com/ArmandoCH85/onpevoto.git
+  sudo chown -R $USER:$USER /opt/onpevoto
+  cd /opt/onpevoto
+  npm install
+
+## 4. Instalar Playwright + Chromium + dependencias del sistema
+
+  npx playwright install chromium
+  sudo npx playwright install-deps chromium
+
+  # Si falla, instalar dependencias manualmente:
+  sudo apt install -y libnss3 libnspr4 libatk1.0-0 libatk-bridge2.0-0 \
+    libcups2 libdrm2 libxkbcommon0 libxcomposite1 libxdamage1 libxrandr2 \
+    libgbm1 libpango-1.0-0 libcairo2 libasound2 libxshmfence1
+
+## 4b. Descargar base GeoIP para deteccion de pais (contador de visitas)
+
+  1. Ir a https://www.maxmind.com/en/geolite2/signup
+  2. Crear cuenta gratuita
+  3. En el dashboard, ir a "Manage License Keys" → crear nueva key
+  4. Descargar GeoLite2-Country en formato MMDB:
+     - Ir a "Download Files" → descargar "GeoLite2 Country: CSV"
+     O usar la API con tu license key:
+       LICENSE_KEY=TU_LICENSE_KEY
+       ACCOUNT_ID=TU_ACCOUNT_ID
+       cd /opt/onpevoto/geoip
+       curl -o GeoLite2-Country.tar.gz \
+         "https://download.maxmind.com/app/geoip_download?edition_id=GeoLite2-Country&license_key=${LICENSE_KEY}&suffix=tar.gz"
+       tar -xzf GeoLite2-Country.tar.gz
+       mv GeoLite2-Country_*/GeoLite2-Country.mmdb .
+       rm -rf GeoLite2-Country_* GeoLite2-Country.tar.gz
+
+  Sin la DB GeoIP, el contador funciona pero no detecta pais.
+  Con la DB, muestra banderas y nombres de pais por cada visitante.
+
+## 5. Probar que funciona
+
+  node server.mjs
+  # En otra terminal:
+  curl http://localhost:3000
+  # Debe devolver HTML
+
+  # Si funciona, Ctrl+C para pararlo
+
+## 6. Crear servicio systemd (para que corra siempre)
+
+  sudo nano /etc/systemd/system/onpevoto.service
+
+  Contenido:
+  [Unit]
+  Description=ONPE Voto Dashboard
+  After=network.target
+
+  [Service]
+  Type=simple
+  User=www-data
+  Group=www-data
+  WorkingDirectory=/opt/onpevoto
+  ExecStart=/usr/bin/node server.mjs
+  Restart=on-failure
+  RestartSec=10
+  Environment=PORT=3000
+  Environment=NODE_ENV=production
+
+  [Install]
+  WantedBy=multi-user.target
+
+  Permisos:
+  sudo chown -R www-data:www-data /opt/onpevoto
+
+  Activar:
+  sudo systemctl daemon-reload
+  sudo systemctl enable onpevoto
+  sudo systemctl start onpevoto
+
+  Verificar:
+  sudo systemctl status onpevoto
+  curl http://localhost:3000
+
+  Ver logs:
+  sudo journalctl -u onpevoto -f
+
+## 7. Instalar Nginx
+
+  sudo apt install -y nginx
+  sudo systemctl enable nginx
+  sudo systemctl start nginx
+
+  Verificar:
+  curl -I http://localhost
+  # Debe mostrar "Welcome to nginx"
+
+## 8. Configurar Nginx como reverse proxy
+
+  sudo nano /etc/nginx/sites-available/votoperu.site
+
+  Contenido:
+  server {
+      listen 80;
+      server_name www.votoperu.site votoperu.site;
+
+      location / {
+          proxy_pass http://127.0.0.1:3000;
+          proxy_set_header Host $host;
+          proxy_set_header X-Real-IP $remote_addr;
+          proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+          proxy_set_header X-Forwarded-Proto $scheme;
+      }
+  }
+
+  Activar el sitio:
+  sudo ln -s /etc/nginx/sites-available/votoperu.site /etc/nginx/sites-enabled/
+  sudo rm /etc/nginx/sites-enabled/default
+
+  Verificar config:
+  sudo nginx -t
+
+  Si dice "ok", recargar:
+  sudo systemctl reload nginx
+
+  Probar desde afuera (desde tu maquina local):
+  curl -I http://www.votoperu.site
+  # Debe devolver HTML de ONPE
+
+## 9. Firewall - Abrir solo lo necesario
+
+  sudo ufw allow OpenSSH
+  sudo ufw allow 'Nginx Full'
+  sudo ufw enable
+  sudo ufw status
+
+  # Debe mostrar:
+  # OpenSSH      ALLOW    Anywhere
+  # Nginx Full   ALLOW    Anywhere
+
+## 10. Instalar Certbot y obtener certificado SSL (HTTPS)
+
+  sudo apt install -y certbot python3-certbot-nginx
+
+  Obtener certificado:
+  sudo certbot --nginx -d www.votoperu.site -d votoperu.site
+
+  # Seguir las instrucciones:
+  # - Ingresar email
+  # - Aceptar terminos
+  # - Elegir si redirige HTTP a HTTPS (elegir SI = opcion 2)
+
+  Verificar:
+  curl -I https://www.votoperu.site
+  # Debe mostrar 200 y certificado valido
+
+  Certbot renueva automaticamente. Verificar:
+  sudo certbot renew --dry-run
+
+## 11. Verificacion final
+
+  # Desde tu navegador:
+  # https://www.votoperu.site → debe cargar el dashboard ONPE
+  # https://www.votoperu.site/candidatos.html → todos los candidatos
+  # https://www.votoperu.site/resumen.html → resumen electoral
+
+  # Desde el servidor:
+  sudo systemctl status onpevoto    # servicio corriendo
+  sudo systemctl status nginx       # nginx corriendo
+  curl https://www.votoperu.site    # responde OK
+
+## Comandos utiles
+
+  # Reiniciar la app
+  sudo systemctl restart onpevoto
+
+  # Ver logs en tiempo real
+  sudo journalctl -u onpevoto -f
+
+  # Forzar un re-scrape
+  curl http://localhost:3000/api/refresh
+
+  # Ver estado del scraper
+  curl http://localhost:3000/api/status
+
+  # Renovar certificado manual
+  sudo certbot renew
+
+  # Reiniciar nginx
+  sudo systemctl reload nginx
+
+## Notas importantes
+
+- El scraper usa Playwright + Chromium headless, necesita al menos 512MB RAM libre
+- Scrapea cada 5 minutos automaticamente
+- Los datos se guardan en /opt/onpevoto/data.json
+- Las imagenes se cachean en /opt/onpevoto/img-cache/
+- Si cambias el codigo: git pull && npm install && sudo systemctl restart onpevoto
+- Si Chromium falla, verificar: npx playwright install-deps chromium

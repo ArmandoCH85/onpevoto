@@ -1,8 +1,6 @@
-# Subir a GitHub
-
 cd /home/senpai/scrape
 git add -A
-git commit -m "feat: ONPE dashboard with voltereta + geographic drill-down"
-git remote add origin https://github.com/ArmandoCH85/onpevoto.git
+git commit -m "feat: voltereta + geographic drill-down + visit counter"
+git remote add origin https://github.com/ArmandoCH85/onpevoto.git 2>/dev/null
 git branch -M main
 git push -u origin main

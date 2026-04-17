@@ -308,6 +308,35 @@
       .geo-table-header > :nth-child(4), .geo-row > :nth-child(4),
       .geo-table-header > :nth-child(5), .geo-row > :nth-child(5) { display: none; }
     }
+
+    .visitas-widget {
+      display: flex; align-items: center; gap: 1.5rem;
+      padding: 1rem 1.5rem; border-radius: 14px;
+      background: white; border: 1px solid var(--gray-200);
+      margin-top: 2rem;
+    }
+
+    .visitas-count { display: flex; flex-direction: column; align-items: center; flex-shrink: 0; padding-right: 1.5rem; border-right: 1px solid var(--gray-200); }
+
+    .visitas-number { font-size: 1.6rem; font-weight: 900; color: var(--onpe-blue); line-height: 1; }
+    .visitas-label { font-size: 0.65rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: var(--gray-500); margin-top: 2px; }
+
+    .visitas-countries { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+
+    .visitas-country {
+      display: flex; align-items: center; gap: 0.35rem;
+      padding: 0.3rem 0.7rem; border-radius: 20px;
+      background: var(--gray-100); font-size: 0.75rem;
+    }
+
+    .visitas-flag { font-size: 1rem; }
+    .visitas-country-name { font-weight: 600; color: var(--gray-700); }
+    .visitas-country-count { font-weight: 800; color: var(--onpe-blue); margin-left: 0.2rem; }
+
+    @media (max-width: 640px) {
+      .visitas-widget { flex-direction: column; align-items: flex-start; gap: 0.75rem; }
+      .visitas-count { border-right: none; padding-right: 0; border-bottom: 1px solid var(--gray-200); padding-bottom: 0.5rem; width: 100%; flex-direction: row; justify-content: center; gap: 0.5rem; }
+    }
   </style>
 </head>
 <body>
@@ -332,6 +361,7 @@
       <div id="top3-section"></div>
       <div class="rest-section" id="rest-section"></div>
       <div id="geo-section"></div>
+      <div id="visitas-section"></div>
     </div>
   </div>
 
@@ -340,7 +370,7 @@
   </footer>
 
   <script type="module">
-    import { fetchAllData, renderHeader, renderScopeTabs, renderMiniStats, renderVoltereta, renderGeoSection, getList, getTotales, fmt, fmtPct, fmtPctShort, fmtDiff, fmtDate, photoUrl, partyLogoUrl, setScope, getScope, setSelectedDepto, getSelectedDepto, fetchDeptoResultados } from '/app.js';
+    import { fetchAllData, renderHeader, renderScopeTabs, renderMiniStats, renderVoltereta, renderGeoSection, renderVisitas, getList, getTotales, fmt, fmtPct, fmtPctShort, fmtDiff, fmtDate, photoUrl, partyLogoUrl, setScope, getScope, setSelectedDepto, getSelectedDepto, fetchDeptoResultados } from '/app.js';
 
     function getConnectorCls(diff) {
       if (diff < 10000) return 'very-close';
@@ -458,6 +488,7 @@
       renderTop3();
       renderRest();
       renderGeoSection('geo-section', handleDeptoSelect);
+      renderVisitas('visitas-section');
     }
 
     async function handleDeptoSelect(ubigeo) {
