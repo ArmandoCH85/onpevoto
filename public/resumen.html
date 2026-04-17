@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="es" data-page="resumen">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ONPE - Resumen Electoral</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/shared.css">
+  <script src="/header.js"></script>
+  <script type="module" src="/app.js"></script>
+  <style>
+    .cards-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 1rem; margin-bottom: 2rem;
+    }
+
+    .card {
+      background: white; border-radius: 16px; padding: 1.25rem;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 4px 12px rgba(0,0,0,0.04);
+      border: 1px solid var(--gray-200); transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+
+    .card-label { font-size: 0.65rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: var(--gray-500); margin-bottom: 0.4rem; }
+    .card-value { font-size: 1.6rem; font-weight: 800; color: var(--gray-900); line-height: 1.2; }
+    .card-sub { font-size: 0.75rem; color: var(--gray-600); margin-top: 0.2rem; }
+
+    .progress-bar-container { width: 100%; height: 6px; background: var(--gray-200); border-radius: 3px; margin-top: 0.6rem; overflow: hidden; }
+    .progress-bar-fill { height: 100%; border-radius: 3px; transition: width 1s ease-out; }
+    .progress-bar-fill.red { background: linear-gradient(90deg, var(--onpe-red), var(--onpe-red-dark)); }
+    .progress-bar-fill.blue { background: linear-gradient(90deg, var(--onpe-blue), var(--onpe-blue-light)); }
+    .progress-bar-fill.green { background: linear-gradient(90deg, #16A34A, #22C55E); }
+    .progress-bar-fill.orange { background: linear-gradient(90deg, #EA580C, #F59E0B); }
+
+    .section-title {
+      font-size: 1rem; font-weight: 700; color: var(--gray-800); margin-bottom: 1rem;
+      display: flex; align-items: center; gap: 0.5rem;
+    }
+
+    .section-title::before { content: ''; width: 4px; height: 18px; background: var(--onpe-red); border-radius: 2px; }
+
+    .two-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 2rem; }
+
+    .ambito-card {
+      background: white; border-radius: 16px; padding: 1.25rem;
+      border: 1px solid var(--gray-200);
+    }
+
+    .ambito-title { font-size: 0.85rem; font-weight: 700; color: var(--onpe-blue); margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.5rem; }
+
+    .ambito-title .icon {
+      width: 28px; height: 28px; background: var(--onpe-blue);
+      color: white; border-radius: 8px; display: flex;
+      align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 800;
+    }
+
+    .stat-row { display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 0; border-bottom: 1px solid var(--gray-100); }
+    .stat-row:last-child { border-bottom: none; }
+    .stat-row-label { font-size: 0.75rem; color: var(--gray-600); }
+    .stat-row-value { font-size: 0.85rem; font-weight: 700; color: var(--gray-800); }
+
+    @media (max-width: 640px) {
+      .two-cols { grid-template-columns: 1fr; }
+      .cards-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+  </style>
+</head>
+<body>
+  <header class="app-header" id="app-header"></header>
+
+  <div class="app-container">
+    <div class="app-loading" id="app-loading">
+      <div class="spinner"></div>
+      <div>Cargando resultados...</div>
+    </div>
+
+    <div class="app-error" id="app-error" style="display:none">
+      <h2>Error al cargar datos</h2>
+      <p id="app-error-msg"></p>
+      <button class="retry-btn" onclick="init()">Reintentar</button>
+    </div>
+
+    <div id="app-content" style="display:none">
+      <div id="scope-tabs"></div>
+
+      <div class="section-title">Resumen Presidencial</div>
+      <div class="cards-grid" id="cards-totales"></div>
+
+      <div class="two-cols">
+        <div class="ambito-card" id="card-peru"></div>
+        <div class="ambito-card" id="card-extranjero"></div>
+      </div>
+
+      <div class="section-title">Mesas de Votacion</div>
+      <div class="cards-grid" id="cards-mesa"></div>
+    </div>
+  </div>
+
+  <footer class="app-footer">
+    Datos de <a href="https://resultadoelectoral.onpe.gob.pe/main/resumen" target="_blank">resultadoelectoral.onpe.gob.pe</a>
+  </footer>
+
+  <script type="module">
+    import { fetchAllData, renderHeader, renderScopeTabs, fmt, fmtPct, getTotales, getData } from '/app.js';
+
+    function renderCard(label, value, sub, pct, cls) {
+      return `<div class="card">
+        <div class="card-label">${label}</div>
+        <div class="card-value">${value}</div>
+        ${sub ? `<div class="card-sub">${sub}</div>` : ''}
+        ${pct != null ? `<div class="progress-bar-container"><div class="progress-bar-fill ${cls || 'red'}" style="width:${Math.min(pct, 100)}%"></div></div>` : ''}
+      </div>`;
+    }
+
+    function renderStatRow(label, value) {
+      return `<div class="stat-row"><span class="stat-row-label">${label}</span><span class="stat-row-value">${value}</span></div>`;
+    }
+
+    function renderTotales(t, containerId) {
+      const el = document.getElementById(containerId);
+      if (!el || !t) { if (el) el.innerHTML = ''; return; }
+      el.innerHTML = [
+        renderCard('Actas Contabilizadas', fmtPct(t.actasContabilizadas), `${fmt(t.contabilizadas)} de ${fmt(t.totalActas)}`, t.actasContabilizadas, 'red'),
+        renderCard('Participacion', fmtPct(t.participacionCiudadana), null, t.participacionCiudadana, 'green'),
+        renderCard('Votos Emitidos', fmt(t.totalVotosEmitidos), null, null),
+        renderCard('Votos Validos', fmt(t.totalVotosValidos), fmtPct(t.porcentajeVotosValidos), null),
+        renderCard('Enviadas JEE', fmtPct(t.actasEnviadasJee), `${fmt(t.enviadasJee)}`, t.actasEnviadasJee, 'orange'),
+        renderCard('Pendientes JEE', fmtPct(t.actasPendientesJee), `${fmt(t.pendientesJee)}`, t.actasPendientesJee, 'blue'),
+      ].join('');
+    }
+
+    function renderAmbitoCard(t, containerId, title, iconText) {
+      const el = document.getElementById(containerId);
+      if (!el || !t) { if (el) el.innerHTML = ''; return; }
+      el.innerHTML = `
+        <div class="ambito-title"><div class="icon">${iconText}</div>${title}</div>
+        ${renderStatRow('Actas contabilizadas', `<strong>${fmtPct(t.actasContabilizadas)}</strong>`)}
+        ${renderStatRow('Contabilizadas / Total', `${fmt(t.contabilizadas)} / ${fmt(t.totalActas)}`)}
+        ${renderStatRow('Participacion', fmtPct(t.participacionCiudadana))}
+        ${renderStatRow('Votos emitidos', fmt(t.totalVotosEmitidos))}
+        ${renderStatRow('Votos validos', fmt(t.totalVotosValidos))}
+        ${renderStatRow('Enviadas JEE', `${fmt(t.enviadasJee)} (${fmtPct(t.actasEnviadasJee)})`)}
+        ${renderStatRow('Pendientes JEE', `${fmt(t.pendientesJee)} (${fmtPct(t.actasPendientesJee)})`)}`;
+    }
+
+    function renderMesa(m) {
+      const el = document.getElementById('cards-mesa');
+      if (!el || !m) { if (el) el.innerHTML = ''; return; }
+      const total = (m.mesasInstaladas || 0) + (m.mesasNoInstaladas || 0) + (m.mesasPendientes || 0);
+      const instPct = total > 0 ? (m.mesasInstaladas / total * 100) : 0;
+      el.innerHTML = [
+        renderCard('Instaladas', fmt(m.mesasInstaladas), fmtPct(instPct), instPct, 'green'),
+        renderCard('No Instaladas', fmt(m.mesasNoInstaladas), null, null),
+        renderCard('Pendientes', fmt(m.mesasPendientes), null, null),
+        renderCard('Total', fmt(total), null, null),
+      ].join('');
+    }
+
+    function renderAll() {
+      renderHeader();
+      const data = getData();
+      const t = getTotales();
+      renderTotales(t, 'cards-totales');
+
+      const totales = data?.totales || {};
+      renderAmbitoCard(totales.peru, 'card-peru', 'Peru', 'PE');
+      renderAmbitoCard(totales.extranjero, 'card-extranjero', 'Extranjero', 'EX');
+      renderMesa(totales.mesa);
+    }
+
+    async function init() {
+      document.getElementById('app-loading').style.display = 'flex';
+      document.getElementById('app-error').style.display = 'none';
+      document.getElementById('app-content').style.display = 'none';
+      try {
+        await fetchAllData();
+        renderAll();
+        document.getElementById('app-loading').style.display = 'none';
+        document.getElementById('app-content').style.display = 'block';
+      } catch (e) {
+        document.getElementById('app-loading').style.display = 'none';
+        document.getElementById('app-error').style.display = 'block';
+        document.getElementById('app-error-msg').textContent = e.message;
+      }
+    }
+
+    init();
+    setInterval(init, 5 * 60 * 1000);
+  </script>
+</body>
+</html>

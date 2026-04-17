@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="es" data-page="top3">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ONPE - Top 3 Candidatos</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/shared.css">
+  <script src="/header.js"></script>
+  <script type="module" src="/app.js"></script>
+  <style>
+    .top3-list { display: flex; flex-direction: column; gap: 0; margin-bottom: 2rem; }
+
+    .candidate-card {
+      background: white; border-radius: 20px;
+      padding: 1.5rem 2rem; border: 2px solid var(--gray-200);
+      position: relative; overflow: hidden;
+    }
+
+    .candidate-card.rank-1 {
+      border-color: var(--gold);
+      box-shadow: 0 0 30px var(--gold-glow), 0 8px 32px rgba(0,0,0,0.08);
+    }
+
+    .candidate-card.rank-2 {
+      border-color: var(--silver);
+      box-shadow: 0 0 20px var(--silver-glow), 0 4px 16px rgba(0,0,0,0.06);
+    }
+
+    .candidate-card.rank-3 {
+      border-color: var(--bronze);
+      box-shadow: 0 0 20px var(--bronze-glow), 0 4px 16px rgba(0,0,0,0.06);
+    }
+
+    .card-main { display: flex; gap: 1.25rem; align-items: center; }
+
+    .card-photo-wrap { position: relative; flex-shrink: 0; }
+
+    .card-photo {
+      width: 80px; height: 80px; border-radius: 16px;
+      object-fit: cover; background: var(--gray-200); display: block;
+    }
+
+    .rank-1 .card-photo { width: 100px; height: 100px; border-radius: 20px; }
+
+    .card-photo-rank {
+      position: absolute; bottom: -6px; right: -6px;
+      width: 30px; height: 30px; border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.85rem; font-weight: 900; color: white;
+      border: 3px solid white;
+    }
+
+    .rank-1 .card-photo-rank { background: var(--gold); width: 34px; height: 34px; border-radius: 12px; }
+    .rank-2 .card-photo-rank { background: var(--silver); }
+    .rank-3 .card-photo-rank { background: var(--bronze); }
+
+    .card-identity { flex: 1; min-width: 0; }
+
+    .card-name { font-size: 1.1rem; font-weight: 800; color: var(--gray-900); line-height: 1.2; }
+    .rank-1 .card-name { font-size: 1.3rem; }
+
+    .card-party { font-size: 0.8rem; font-weight: 500; color: var(--gray-600); margin-top: 2px; display: flex; align-items: center; gap: 0.5rem; }
+
+    .card-party-logo { height: 22px; width: auto; border-radius: 3px; }
+
+    .card-pct-wrap { text-align: right; flex-shrink: 0; }
+
+    .card-pct { font-size: 2.2rem; font-weight: 900; color: var(--onpe-red); line-height: 1; }
+    .rank-1 .card-pct { font-size: 2.8rem; }
+
+    .card-pct-label { font-size: 0.6rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: var(--gray-500); margin-top: 2px; }
+
+    .card-stats {
+      display: flex; gap: 1.5rem; margin-top: 1rem;
+      padding-top: 1rem; border-top: 1px solid var(--gray-200);
+      align-items: center;
+    }
+
+    .card-votes-block { flex: 1; }
+
+    .card-votes-total { font-size: 1.15rem; font-weight: 800; color: var(--gray-900); }
+    .rank-1 .card-votes-total { font-size: 1.3rem; }
+
+    .card-votes-label { font-size: 0.65rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.3px; color: var(--gray-500); }
+
+    .card-bar-track { height: 10px; background: var(--gray-200); border-radius: 5px; overflow: hidden; margin-top: 0.5rem; }
+    .rank-1 .card-bar-track { height: 14px; }
+
+    .card-bar-fill { height: 100%; border-radius: 5px; transition: width 1s ease-out; }
+    .rank-1 .card-bar-fill { background: linear-gradient(90deg, var(--gold), #F0C040); }
+    .rank-2 .card-bar-fill { background: linear-gradient(90deg, var(--silver), #90A4AE); }
+    .rank-3 .card-bar-fill { background: linear-gradient(90deg, var(--bronze), #A1887F); }
+
+    .card-diff-block { text-align: center; flex-shrink: 0; min-width: 120px; padding: 0.5rem 0; }
+
+    .card-diff-label { font-size: 0.6rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.3px; color: var(--gray-500); margin-bottom: 0.15rem; }
+
+    .card-diff-value { font-size: 1.6rem; font-weight: 900; color: var(--onpe-red); line-height: 1; }
+    .card-diff-pct { font-size: 0.75rem; font-weight: 600; color: var(--onpe-red); opacity: 0.8; }
+
+    .rank-1 .card-diff-value { font-size: 0.9rem; color: #16A34A; font-weight: 700; }
+    .rank-1 .card-diff-pct { color: #16A34A; }
+
+    .diff-arrow { font-size: 0.9rem; margin-right: 0.15rem; }
+
+    .diff-connector {
+      display: flex; align-items: center; justify-content: center;
+      padding: 0; position: relative; height: 56px;
+      background: linear-gradient(180deg, var(--gray-100), var(--gray-50), var(--gray-100));
+    }
+
+    .diff-connector-inner {
+      display: flex; align-items: center; gap: 1rem;
+      background: white; border: 2px solid var(--onpe-red);
+      padding: 0.5rem 1.5rem; border-radius: 100px;
+      box-shadow: 0 4px 16px rgba(196,30,58,0.15);
+      position: relative; z-index: 1;
+    }
+
+    .diff-connector-inner.close {
+      border-color: #F59E0B; background: #FFFBEB;
+      box-shadow: 0 4px 16px rgba(245,158,11,0.2);
+    }
+
+    .diff-connector-inner.very-close {
+      border-color: #EF4444; background: #FEF2F2;
+      box-shadow: 0 4px 24px rgba(239,68,68,0.3);
+      animation: glow 1.5s ease-in-out infinite;
+    }
+
+    @keyframes glow {
+      0%,100% { box-shadow: 0 4px 24px rgba(239,68,68,0.3); }
+      50% { box-shadow: 0 4px 40px rgba(239,68,68,0.6); }
+    }
+
+    .diff-connector .arrow-down { font-size: 1.2rem; color: var(--onpe-red); font-weight: 900; }
+    .diff-connector-inner.close .arrow-down { color: #D97706; }
+    .diff-connector-inner.very-close .arrow-down { color: #DC2626; }
+
+    .diff-connector .diff-text { font-size: 0.85rem; font-weight: 800; color: var(--onpe-red); }
+    .diff-connector-inner.close .diff-text { color: #D97706; }
+    .diff-connector-inner.very-close .diff-text { color: #DC2626; }
+
+    .diff-connector .diff-pct-text { font-size: 0.7rem; font-weight: 600; color: var(--gray-500); }
+    .diff-connector .diff-label-text { font-size: 0.55rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.3px; color: var(--gray-400); }
+
+    .rest-section { margin-top: 2rem; }
+
+    .rest-title { font-size: 0.85rem; font-weight: 700; color: var(--gray-600); margin-bottom: 0.75rem; padding-bottom: 0.5rem; border-bottom: 2px solid var(--gray-200); }
+
+    .rest-grid {
+      display: grid; grid-template-columns: 50px 50px 1fr 100px 80px;
+      gap: 0; background: white; border-radius: 12px;
+      border: 1px solid var(--gray-200); overflow: hidden;
+    }
+
+    .rest-header { display: contents; }
+    .rest-header > div { padding: 0.6rem 0.75rem; background: var(--gray-100); font-size: 0.6rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--gray-500); border-bottom: 1px solid var(--gray-200); }
+
+    .rest-row { display: contents; }
+    .rest-row > div { padding: 0.5rem 0.75rem; border-bottom: 1px solid var(--gray-100); display: flex; align-items: center; }
+    .rest-row:last-child > div { border-bottom: none; }
+
+    .rest-rank { font-size: 0.85rem; font-weight: 800; color: var(--gray-400); }
+
+    .rest-photo { width: 36px; height: 36px; border-radius: 8px; object-fit: cover; background: var(--gray-200); }
+
+    .rest-info { flex-direction: column; align-items: flex-start !important; }
+    .rest-name { font-size: 0.8rem; font-weight: 600; color: var(--gray-800); }
+    .rest-party { font-size: 0.65rem; color: var(--gray-500); }
+    .rest-votes { font-size: 0.8rem; font-weight: 700; color: var(--gray-700); justify-content: flex-end !important; }
+    .rest-pct { font-size: 0.85rem; font-weight: 800; color: var(--gray-600); justify-content: flex-end !important; }
+
+    @media (max-width: 640px) {
+      .candidate-card { padding: 1rem; }
+      .card-photo { width: 60px !important; height: 60px !important; }
+      .card-name { font-size: 0.95rem !important; }
+      .card-pct { font-size: 1.6rem !important; }
+      .rank-1 .card-pct { font-size: 2rem !important; }
+      .card-stats { flex-direction: column; gap: 0.75rem; }
+      .card-diff-block { text-align: left; min-width: unset; }
+      .card-diff-value { font-size: 1.2rem; }
+      .rest-grid { grid-template-columns: 35px 40px 1fr 70px; }
+      .rest-grid > :nth-child(5), .rest-header > :nth-child(5) { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <header class="app-header" id="app-header"></header>
+
+  <div class="app-container">
+    <div class="app-loading" id="app-loading">
+      <div class="spinner"></div>
+      <div>Cargando resultados...</div>
+    </div>
+
+    <div class="app-error" id="app-error" style="display:none">
+      <h2>Error al cargar datos</h2>
+      <p id="app-error-msg"></p>
+      <button class="retry-btn" onclick="init()">Reintentar</button>
+    </div>
+
+    <div id="app-content" style="display:none">
+      <div id="scope-tabs"></div>
+      <div class="mini-stats-row" id="summary-row"></div>
+      <div id="top3-section"></div>
+      <div class="rest-section" id="rest-section"></div>
+    </div>
+  </div>
+
+  <footer class="app-footer">
+    Datos de <a href="https://resultadoelectoral.onpe.gob.pe/main/presidenciales" target="_blank">resultadoelectoral.onpe.gob.pe</a>
+  </footer>
+
+  <script type="module">
+    import { fetchAllData, renderHeader, renderScopeTabs, renderMiniStats, getList, getTotales, fmt, fmtPct, fmtPctShort, fmtDiff, fmtDate, photoUrl, partyLogoUrl, setScope, getScope } from '/app.js';
+
+    function getConnectorCls(diff) {
+      if (diff < 10000) return 'very-close';
+      if (diff < 500000) return 'close';
+      return '';
+    }
+
+    function renderTop3() {
+      const list = getList();
+      const sorted = [...list].sort((a, b) => (b.porcentajeVotosValidos || 0) - (a.porcentajeVotosValidos || 0));
+      const top3 = sorted.slice(0, 3);
+      const maxPct = top3[0]?.porcentajeVotosValidos || 1;
+      if (!top3.length) { document.getElementById('top3-section').innerHTML = ''; return; }
+
+      const ranks = ['rank-1', 'rank-2', 'rank-3'];
+      let html = '<div class="top3-list">';
+
+      top3.forEach((c, i) => {
+        const pct = c.porcentajeVotosValidos || 0;
+        const barW = maxPct > 0 ? (pct / maxPct * 100) : 0;
+        const diff = i > 0 ? (top3[i - 1].totalVotosValidos - c.totalVotosValidos) : null;
+        const diffPct = i > 0 ? (top3[i - 1].porcentajeVotosValidos - pct) : null;
+        const leadOver2nd = i === 0 && top3[1] ? (c.totalVotosValidos - top3[1].totalVotosValidos) : null;
+        const leadPct = i === 0 && top3[1] ? (pct - top3[1].porcentajeVotosValidos) : null;
+
+        html += `
+          <div class="candidate-card ${ranks[i]}">
+            <div class="card-main">
+              <div class="card-photo-wrap">
+                <img class="card-photo" src="${photoUrl(c.dniCandidato)}" alt="${c.nombreCandidato}" onerror="this.style.display='none'">
+                <div class="card-photo-rank">${i + 1}</div>
+              </div>
+              <div class="card-identity">
+                <div class="card-name">${c.nombreCandidato || c.nombreAgrupacionPolitica}</div>
+                <div class="card-party">
+                  ${c.nombreAgrupacionPolitica}
+                  <img class="card-party-logo" src="${partyLogoUrl(c.codigoAgrupacionPolitica)}" alt="" onerror="this.style.display='none'">
+                </div>
+              </div>
+              <div class="card-pct-wrap">
+                <div class="card-pct">${fmtPctShort(pct)}</div>
+                <div class="card-pct-label">% validos</div>
+              </div>
+            </div>
+            <div class="card-stats">
+              <div class="card-votes-block">
+                <div class="card-votes-label">Votos totales</div>
+                <div class="card-votes-total">${fmt(c.totalVotosValidos)}</div>
+                <div class="card-bar-track"><div class="card-bar-fill" style="width:${barW}%"></div></div>
+              </div>
+              <div class="card-diff-block">
+                ${i === 0 ? `
+                  <div class="card-diff-label">Ventaja sobre 2.do</div>
+                  <div class="card-diff-value">${leadOver2nd != null ? fmtDiff(leadOver2nd) : '-'}</div>
+                  <div class="card-diff-pct">${leadPct != null ? fmtPct(leadPct) + ' pts' : ''}</div>
+                ` : `
+                  <div class="card-diff-label">Diferencia con ${i}.er lugar</div>
+                  <div class="card-diff-value"><span class="diff-arrow">&#9660;</span>${fmtDiff(diff)}</div>
+                  <div class="card-diff-pct">${fmtPct(diffPct)} pts</div>
+                `}
+              </div>
+            </div>
+          </div>`;
+
+        if (i < top3.length - 1) {
+          const nextDiff = c.totalVotosValidos - (top3[i + 1]?.totalVotosValidos || 0);
+          const nextDiffPct = pct - (top3[i + 1]?.porcentajeVotosValidos || 0);
+          const cls = getConnectorCls(nextDiff);
+          html += `
+            <div class="diff-connector">
+              <div class="diff-connector-inner ${cls}">
+                <span class="arrow-down">&#9660;</span>
+                <div>
+                  <div class="diff-label-text">Diferencia ${i + 1}er vs ${i + 2}do</div>
+                  <div class="diff-text">${fmtDiff(nextDiff)} votos</div>
+                  <div class="diff-pct-text">${fmtPct(nextDiffPct)} puntos</div>
+                </div>
+              </div>
+            </div>`;
+        }
+      });
+
+      html += '</div>';
+      document.getElementById('top3-section').innerHTML = html;
+    }
+
+    function renderRest() {
+      const list = getList();
+      const sorted = [...list].sort((a, b) => (b.porcentajeVotosValidos || 0) - (a.porcentajeVotosValidos || 0));
+      const rest = sorted.slice(3);
+      if (!rest.length) { document.getElementById('rest-section').innerHTML = ''; return; }
+
+      const rows = rest.map((c, i) => `
+        <div class="rest-row">
+          <div class="rest-rank">${i + 4}</div>
+          <div><img class="rest-photo" src="${photoUrl(c.dniCandidato)}" alt="" onerror="this.style.display='none'"></div>
+          <div class="rest-info"><div class="rest-name">${c.nombreCandidato || c.nombreAgrupacionPolitica}</div><div class="rest-party">${c.nombreAgrupacionPolitica}</div></div>
+          <div class="rest-votes">${fmt(c.totalVotosValidos)}</div>
+          <div class="rest-pct">${fmtPct(c.porcentajeVotosValidos)}</div>
+        </div>`).join('');
+
+      document.getElementById('rest-section').innerHTML = `
+        <div class="rest-title">Demas candidaturas (${rest.length})</div>
+        <div class="rest-grid">
+          <div class="rest-header"><div>#</div><div></div><div>Candidato / Partido</div><div>Votos</div><div>% Validos</div></div>
+          ${rows}
+        </div>`;
+    }
+
+    function renderAll() {
+      renderHeader();
+      renderScopeTabs('scope-tabs', renderAll);
+      renderMiniStats('summary-row', getTotales());
+      renderTop3();
+      renderRest();
+    }
+
+    async function init() {
+      document.getElementById('app-loading').style.display = 'flex';
+      document.getElementById('app-error').style.display = 'none';
+      document.getElementById('app-content').style.display = 'none';
+      try {
+        await fetchAllData();
+        renderAll();
+        document.getElementById('app-loading').style.display = 'none';
+        document.getElementById('app-content').style.display = 'block';
+      } catch (e) {
+        document.getElementById('app-loading').style.display = 'none';
+        document.getElementById('app-error').style.display = 'block';
+        document.getElementById('app-error-msg').textContent = e.message;
+      }
+    }
+
+    init();
+    setInterval(init, 5 * 60 * 1000);
+  </script>
+</body>
+</html>

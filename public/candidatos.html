@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="es" data-page="candidatos">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ONPE - Todos los Candidatos</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/shared.css">
+  <script src="/header.js"></script>
+  <script type="module" src="/app.js"></script>
+  <style>
+    .results-table {
+      background: white; border-radius: 16px;
+      border: 1px solid var(--gray-200); overflow: hidden;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    }
+
+    .table-header {
+      display: grid; grid-template-columns: 50px 50px 1fr 180px 100px 100px;
+      padding: 0.75rem 1rem; background: var(--gray-100);
+      font-size: 0.6rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.5px; color: var(--gray-500);
+      border-bottom: 1px solid var(--gray-200);
+    }
+
+    .table-row {
+      display: grid; grid-template-columns: 50px 50px 1fr 180px 100px 100px;
+      padding: 0.75rem 1rem; border-bottom: 1px solid var(--gray-100);
+      align-items: center; transition: background 0.15s;
+    }
+
+    .table-row:hover { background: var(--gray-50); }
+    .table-row:last-child { border-bottom: none; }
+    .table-row.top5 { background: rgba(196,30,58,0.02); }
+    .table-row.top5:hover { background: rgba(196,30,58,0.04); }
+
+    .row-rank { font-size: 0.85rem; font-weight: 800; color: var(--gray-400); }
+    .table-row.top5 .row-rank { color: var(--onpe-red); }
+
+    .row-photo { width: 36px; height: 36px; border-radius: 8px; object-fit: cover; background: var(--gray-200); }
+
+    .row-candidate { min-width: 0; }
+    .row-candidate-name { font-size: 0.85rem; font-weight: 700; color: var(--gray-900); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .row-candidate-party { font-size: 0.7rem; color: var(--gray-500); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+    .row-bar { display: flex; align-items: center; }
+    .row-bar-track { flex: 1; height: 8px; background: var(--gray-200); border-radius: 4px; overflow: hidden; margin-right: 0.5rem; }
+    .row-bar-fill { height: 100%; border-radius: 4px; background: linear-gradient(90deg, var(--onpe-red), var(--onpe-red-dark)); transition: width 0.8s ease-out; }
+    .row-bar-fill.low { background: linear-gradient(90deg, var(--gray-400), var(--gray-500)); }
+
+    .row-pct { font-size: 0.9rem; font-weight: 800; color: var(--onpe-red); text-align: right; }
+    .table-row:not(.top5) .row-pct { color: var(--gray-700); }
+
+    .row-votes { font-size: 0.8rem; font-weight: 600; color: var(--gray-600); text-align: right; }
+
+    @media (max-width: 768px) {
+      .table-header, .table-row { grid-template-columns: 40px 40px 1fr 80px; }
+      .table-header > :nth-child(4),
+      .table-row > :nth-child(4),
+      .table-header > :nth-child(6),
+      .table-row > :nth-child(6) { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <header class="app-header" id="app-header"></header>
+
+  <div class="app-container">
+    <div class="app-loading" id="app-loading">
+      <div class="spinner"></div>
+      <div>Cargando resultados...</div>
+    </div>
+
+    <div class="app-error" id="app-error" style="display:none">
+      <h2>Error al cargar datos</h2>
+      <p id="app-error-msg"></p>
+      <button class="retry-btn" onclick="init()">Reintentar</button>
+    </div>
+
+    <div id="app-content" style="display:none">
+      <div id="scope-tabs"></div>
+      <div class="mini-stats-row" id="summary-row"></div>
+      <div id="table-section"></div>
+    </div>
+  </div>
+
+  <footer class="app-footer">
+    Datos de <a href="https://resultadoelectoral.onpe.gob.pe/main/presidenciales" target="_blank">resultadoelectoral.onpe.gob.pe</a>
+  </footer>
+
+  <script type="module">
+    import { fetchAllData, renderHeader, renderScopeTabs, renderMiniStats, getList, getTotales, fmt, fmtPct, photoUrl } from '/app.js';
+
+    function renderTable() {
+      const list = getList();
+      const sorted = [...list].sort((a, b) => (b.porcentajeVotosValidos || 0) - (a.porcentajeVotosValidos || 0));
+      const maxPct = sorted[0]?.porcentajeVotosValidos || 1;
+
+      const rows = sorted.map((c, i) => {
+        const pct = c.porcentajeVotosValidos || 0;
+        const barW = maxPct > 0 ? (pct / maxPct * 100) : 0;
+        const isTop5 = i < 5;
+        const isLow = pct < 2;
+
+        return `
+          <div class="table-row ${isTop5 ? 'top5' : ''}">
+            <div class="row-rank">${i + 1}</div>
+            <div><img class="row-photo" src="${photoUrl(c.dniCandidato)}" alt="" onerror="this.style.display='none'"></div>
+            <div class="row-candidate">
+              <div class="row-candidate-name">${c.nombreCandidato || c.nombreAgrupacionPolitica}</div>
+              <div class="row-candidate-party">${c.nombreAgrupacionPolitica}</div>
+            </div>
+            <div class="row-bar">
+              <div class="row-bar-track"><div class="row-bar-fill ${isLow ? 'low' : ''}" style="width:${barW}%"></div></div>
+            </div>
+            <div class="row-pct">${fmtPct(pct)}</div>
+            <div class="row-votes">${fmt(c.totalVotosValidos)}</div>
+          </div>`;
+      });
+
+      document.getElementById('table-section').innerHTML = `
+        <div class="results-table">
+          <div class="table-header">
+            <div>#</div><div></div><div>Candidato / Partido</div><div>Votos</div><div>% Validos</div><div>Total</div>
+          </div>
+          ${rows.join('')}
+        </div>`;
+    }
+
+    function renderAll() {
+      renderHeader();
+      renderScopeTabs('scope-tabs', renderAll);
+      renderMiniStats('summary-row', getTotales());
+      renderTable();
+    }
+
+    async function init() {
+      document.getElementById('app-loading').style.display = 'flex';
+      document.getElementById('app-error').style.display = 'none';
+      document.getElementById('app-content').style.display = 'none';
+      try {
+        await fetchAllData();
+        renderAll();
+        document.getElementById('app-loading').style.display = 'none';
+        document.getElementById('app-content').style.display = 'block';
+      } catch (e) {
+        document.getElementById('app-loading').style.display = 'none';
+        document.getElementById('app-error').style.display = 'block';
+        document.getElementById('app-error-msg').textContent = e.message;
+      }
+    }
+
+    init();
+    setInterval(init, 5 * 60 * 1000);
+  </script>
+</body>
+</html>
