@@ -3,13 +3,13 @@
 cd /opt/onpevoto
 sudo git pull
 sudo npm install
+sudo mkdir -p /var/www/.cache
+sudo chown -R www-data:www-data /var/www/.cache
+sudo -u www-data npx playwright install chromium
+sudo npx playwright install-deps chromium
+sudo chown -R www-data:www-data /opt/onpevoto
 sudo systemctl restart onpevoto
 
-# Verificar
-sudo systemctl status onpevoto
-curl http://localhost:3000
-
-# Si hay que descargar la DB GeoIP (primera vez):
-cd /opt/onpevoto/geoip
-# Ver paso 4b del archivo INSTALACION-UBUNTU-20.04.txt
-sudo chown -R www-data:www-data /opt/onpevoto
+# Verificar:
+sudo journalctl -u onpevoto --no-pager | tail -10
+curl http://localhost:3000/api/status
