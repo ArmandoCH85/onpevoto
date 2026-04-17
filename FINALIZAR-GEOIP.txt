@@ -1,0 +1,9 @@
+sudo chown -R www-data:www-data /opt/onpevoto
+sudo systemctl restart onpevoto
+
+# Verificar:
+sudo journalctl -u onpevoto --no-pager | tail -5
+# Debe decir: [server] GeoIP loaded
+
+# Probar:
+curl http://localhost:3000/api/visitas

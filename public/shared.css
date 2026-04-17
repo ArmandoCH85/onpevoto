@@ -178,6 +178,23 @@ body {
 
 .app-footer a { color: var(--onpe-blue); text-decoration: none; }
 
+.whatsapp-float {
+  position: fixed; bottom: 24px; right: 24px;
+  width: 56px; height: 56px; border-radius: 50%;
+  background: #25D366; color: white;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 4px 16px rgba(37,211,102,0.4);
+  text-decoration: none; z-index: 200;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.whatsapp-float:hover {
+  transform: scale(1.1);
+  box-shadow: 0 6px 24px rgba(37,211,102,0.5);
+}
+
+.whatsapp-float svg { width: 28px; height: 28px; fill: white; }
+
 @media (max-width: 640px) {
   .app-header { padding: 0 1rem; height: 54px; }
   .nav-sub { display: none; }

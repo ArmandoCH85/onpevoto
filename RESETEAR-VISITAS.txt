@@ -1,0 +1,11 @@
+# Resetear visitas y probar GeoIP
+
+echo '{"total":0,"countries":{}}' > /opt/onpevoto/visits.json
+sudo chown www-data:www-data /opt/onpevoto/visits.json
+sudo systemctl restart onpevoto
+
+# Visitar https://www.votoperu.site desde el navegador
+
+# Verificar:
+curl http://localhost:3000/api/visitas
+# Debe mostrar paises con codigos reales (PE, AR, etc.) en vez de "XX"

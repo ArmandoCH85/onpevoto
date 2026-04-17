@@ -1,0 +1,4 @@
+node -e "console.log(new URL('./geoip/GeoLite2-Country.mmdb', 'file:///opt/onpevoto/server.mjs').pathname)"
+ls -la /opt/onpevoto/geoip/GeoLite2-Country.mmdb
+sudo journalctl -u onpevoto --no-pager | grep -i geoip
+sudo journalctl -u onpevoto --no-pager | grep -E "GeoIP|Starting|Running"

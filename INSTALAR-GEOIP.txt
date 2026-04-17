@@ -1,0 +1,10 @@
+# Instalar DB GeoIP en el servidor
+
+sudo mkdir -p /opt/onpevoto/geoip
+sudo cp GeoLite2-Country.mmdb /opt/onpevoto/geoip/
+sudo chown -R www-data:www-data /opt/onpevoto
+sudo systemctl restart onpevoto
+
+# Verificar que cargo:
+sudo journalctl -u onpevoto --no-pager | tail -5
+# Debe decir: [server] GeoIP loaded
