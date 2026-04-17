@@ -46,6 +46,31 @@
     }
   }
   </script>
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "LiveBlogPosting",
+    "name": "Resultados Elecciones Presidenciales Peru 2026 en Vivo",
+    "url": "https://www.votoperu.site/",
+    "headline": "Resultados en vivo - Elecciones Peru 2026",
+    "description": "Cobertura en vivo de los resultados electorales presidenciales de Peru 2026 con datos oficiales ONPE",
+    "datePublished": "2026-04-10T00:00:00-05:00",
+    "coverageStartTime": "2026-04-10T00:00:00-05:00",
+    "coverageEndTime": "2026-04-20T23:59:00-05:00",
+    "liveBlogUpdate": [],
+    "publisher": {
+      "@type": "Organization",
+      "name": "VotoPeru",
+      "url": "https://www.votoperu.site"
+    },
+    "about": {
+      "@type": "Event",
+      "name": "Elecciones Generales Peru 2026",
+      "startDate": "2026-04-10"
+    }
+  }
+  </script>
   <style>
     .top3-list { display: flex; flex-direction: column; gap: 0; margin-bottom: 2rem; }
 
@@ -370,9 +395,53 @@
     }
     .geo-back-btn:hover { background: var(--gray-200); color: var(--gray-800); }
 
+    .visitas-widget {
+      display: flex; align-items: center; gap: 1.5rem;
+      padding: 1rem 1.5rem; border-radius: 14px;
+      background: white; border: 1px solid var(--gray-200);
+      margin-top: 2rem;
+    }
+
+    .visitas-count { display: flex; flex-direction: column; align-items: center; flex-shrink: 0; padding-right: 1.5rem; border-right: 1px solid var(--gray-200); }
+
+    .visitas-number { font-size: 1.6rem; font-weight: 900; color: var(--onpe-blue); line-height: 1; }
+    .visitas-label { font-size: 0.65rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: var(--gray-500); margin-top: 2px; }
+
+    .visitas-countries { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+
+    .visitas-country {
+      display: flex; align-items: center; gap: 0.35rem;
+      padding: 0.3rem 0.7rem; border-radius: 20px;
+      background: var(--gray-100); font-size: 0.75rem;
+    }
+
+    .visitas-flag { font-size: 1rem; }
+    .visitas-country-name { font-weight: 600; color: var(--gray-700); }
+    .visitas-country-count { font-weight: 800; color: var(--onpe-blue); margin-left: 0.2rem; }
+
+    .share-bar {
+      display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1.5rem;
+    }
+
+    .share-btn {
+      padding: 0.5rem 1rem; border-radius: 10px; border: 1px solid var(--gray-200);
+      font-family: inherit; font-size: 0.75rem; font-weight: 600;
+      cursor: pointer; text-decoration: none; display: inline-flex;
+      align-items: center; gap: 0.3rem; transition: all 0.15s;
+      background: white; color: var(--gray-700);
+    }
+
+    .share-btn:hover { background: var(--gray-100); }
+    .share-copy:hover { background: #EFF6FF; border-color: #3B82F6; color: #2563EB; }
+    .share-wa:hover { background: #F0FDF4; border-color: #22C55E; color: #16A34A; }
+    .share-tw:hover { background: #EFF6FF; border-color: #1DA1F2; color: #1DA1F2; }
+    .share-img:hover { background: #FEF2F2; border-color: #EF4444; color: #DC2626; }
+
     @media (max-width: 640px) {
       .visitas-widget { flex-direction: column; align-items: flex-start; gap: 0.75rem; }
       .visitas-count { border-right: none; padding-right: 0; border-bottom: 1px solid var(--gray-200); padding-bottom: 0.5rem; width: 100%; flex-direction: row; justify-content: center; gap: 0.5rem; }
+      .share-bar { gap: 0.4rem; }
+      .share-btn { font-size: 0.68rem; padding: 0.4rem 0.7rem; }
     }
   </style>
 </head>
@@ -395,6 +464,7 @@
       <div id="scope-tabs"></div>
       <div class="mini-stats-row" id="summary-row"></div>
       <div id="voltereta-section"></div>
+      <div id="share-section"></div>
       <div id="top3-section"></div>
       <div class="rest-section" id="rest-section"></div>
       <div id="geo-section"></div>
@@ -411,7 +481,7 @@
   </a>
 
   <script type="module">
-    import { fetchAllData, renderHeader, renderScopeTabs, renderMiniStats, renderVoltereta, renderGeoSection, renderVisitas, getList, getTotales, fmt, fmtPct, fmtPctShort, fmtDiff, fmtDate, photoUrl, partyLogoUrl, setScope, getScope, setSelectedDepto, getSelectedDepto, fetchDeptoResultados } from '/app.js';
+    import { fetchAllData, renderHeader, renderScopeTabs, renderMiniStats, renderVoltereta, renderGeoSection, renderVisitas, renderShareBar, getList, getTotales, fmt, fmtPct, fmtPctShort, fmtDiff, fmtDate, photoUrl, partyLogoUrl, setScope, getScope, setSelectedDepto, getSelectedDepto, fetchDeptoResultados } from '/app.js';
 
     function getConnectorCls(diff) {
       if (diff < 10000) return 'very-close';
@@ -526,6 +596,7 @@
       renderScopeTabs('scope-tabs', () => { setSelectedDepto(null); renderAll(); });
       renderMiniStats('summary-row', getTotales());
       renderVoltereta('voltereta-section', getList(), getTotales());
+      renderShareBar('share-section', getList());
       renderTop3();
       renderRest();
       renderGeoSection('geo-section', handleDeptoSelect);

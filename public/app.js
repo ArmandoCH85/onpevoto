@@ -296,3 +296,112 @@ export async function renderVisitas(containerId) {
     el.innerHTML = '';
   }
 }
+
+export function getShareText(list) {
+  const sorted = [...(list || [])].sort((a, b) => (b.porcentajeVotosValidos || 0) - (a.porcentajeVotosValidos || 0));
+  const top3 = sorted.slice(0, 3);
+  if (!top3.length) return '';
+  const t = getTotales();
+  const pct = t?.actasContabilizadas ? Number(t.actasContabilizadas).toFixed(1) + '%' : '';
+  let text = '🇵🇪 Elecciones 2026 — Resultados en vivo\n\n';
+  top3.forEach((c, i) => {
+    const pctV = Number(c.porcentajeVotosValidos || 0).toFixed(1);
+    text += `${i === 0 ? '🥇' : i === 1 ? '🥈' : '🥉'} ${c.nombreCandidato || c.nombreAgrupacionPolitica} — ${pctV}%\n`;
+  });
+  if (top3.length >= 2) {
+    const diff = top3[0].totalVotosValidos - top3[1].totalVotosValidos;
+    text += `\n⚠️ Diferencia 1ro-2do: ${fmt(diff)} votos`;
+  }
+  if (top3.length >= 3) {
+    const diff23 = top3[1].totalVotosValidos - top3[2].totalVotosValidos;
+    text += `\n⚡ 2do-3ro: ${fmt(diff23)} votos`;
+  }
+  if (pct) text += `\n📊 ${pct} contabilizado`;
+  text += '\n\n📊 votoperu.site';
+  return text;
+}
+
+export function renderShareBar(containerId, list) {
+  const el = document.getElementById(containerId);
+  if (!el) return;
+  const text = getShareText(list);
+  if (!text) { el.innerHTML = ''; return; }
+  el.innerHTML = `
+    <div class="share-bar">
+      <button class="share-btn share-copy" id="share-copy-btn">📋 Copiar resultado</button>
+      <a class="share-btn share-wa" href="https://wa.me/?text=${encodeURIComponent(text)}" target="_blank" rel="noopener">💬 WhatsApp</a>
+      <a class="share-btn share-tw" href="https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}" target="_blank" rel="noopener">🐦 Twitter</a>
+      <button class="share-btn share-img" id="share-img-btn">📷 Imagen</button>
+    </div>`;
+
+  document.getElementById('share-copy-btn')?.addEventListener('click', () => {
+    navigator.clipboard.writeText(text).then(() => {
+      const btn = document.getElementById('share-copy-btn');
+      btn.textContent = '✅ Copiado!';
+      setTimeout(() => { btn.textContent = '📋 Copiar resultado'; }, 2000);
+    });
+  });
+
+  document.getElementById('share-img-btn')?.addEventListener('click', () => {
+    generateShareImage(list);
+  });
+}
+
+function generateShareImage(list) {
+  const sorted = [...(list || [])].sort((a, b) => (b.porcentajeVotosValidos || 0) - (a.porcentajeVotosValidos || 0));
+  const top3 = sorted.slice(0, 3);
+  if (!top3.length) return;
+
+  const canvas = document.createElement('canvas');
+  canvas.width = 1200; canvas.height = 630;
+  const ctx = canvas.getContext('2d');
+
+  ctx.fillStyle = '#C41E3A';
+  ctx.fillRect(0, 0, 1200, 90);
+  ctx.fillStyle = 'white';
+  ctx.font = 'bold 32px Poppins, sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText('🇵🇪  ELECCIONES 2026 — Resultados en Vivo', 600, 55);
+
+  ctx.fillStyle = '#F8F9FA';
+  ctx.fillRect(0, 90, 1200, 540);
+
+  const medals = ['🥇', '🥈', '🥉'];
+  const colors = ['#D4A017', '#607D8B', '#8D6E63'];
+  const y = 130;
+  top3.forEach((c, i) => {
+    const row = y + i * 145;
+    ctx.fillStyle = 'white';
+    ctx.beginPath();
+    ctx.roundRect(40, row, 1120, 120, 16);
+    ctx.fill();
+    ctx.strokeStyle = colors[i];
+    ctx.lineWidth = 3;
+    ctx.stroke();
+
+    ctx.fillStyle = '#212529';
+    ctx.font = 'bold 28px Poppins, sans-serif';
+    ctx.textAlign = 'left';
+    ctx.fillText(`${medals[i]}}`, 70, row + 45);
+    ctx.fillText(c.nombreCandidato || c.nombreAgrupacionPolitica, 120, row + 45);
+
+    ctx.fillStyle = '#868E96';
+    ctx.font = '20px Poppins, sans-serif';
+    ctx.fillText(c.nombreAgrupacionPolitica, 120, row + 80);
+
+    ctx.fillStyle = '#C41E3A';
+    ctx.font = 'bold 48px Poppins, sans-serif';
+    ctx.textAlign = 'right';
+    ctx.fillText(`${Number(c.porcentajeVotosValidos || 0).toFixed(1)}%`, 1120, row + 65);
+  });
+
+  ctx.fillStyle = '#868E96';
+  ctx.font = '18px Poppins, sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText('votoperu.site — Datos oficiales ONPE', 600, 600);
+
+  const link = document.createElement('a');
+  link.download = 'resultados-elecciones-2026.png';
+  link.href = canvas.toDataURL('image/png');
+  link.click();
+}
