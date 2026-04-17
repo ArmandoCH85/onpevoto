@@ -54,14 +54,39 @@ app.get('/api/candidatos', (req, res) => {
   });
 });
 
-app.get('/api/status', (req, res) => {
-  const data = getCachedData();
-  res.json({
-    hasData: !!data,
-    lastScrape: getLastScrape()?.toISOString() || data?.scrapedAt || null,
-    totalTypes: data ? Object.keys(data.totales || {}) : []
+  app.get('/api/status', (req, res) => {
+    const data = getCachedData();
+    res.json({
+      hasData: !!data,
+      lastScrape: getLastScrape()?.toISOString() || data?.scrapedAt || null,
+      totalTypes: data ? Object.keys(data.totales || {}) : []
+    });
   });
-});
+
+  app.get('/api/departamentos', (req, res) => {
+    const data = getCachedData();
+    if (!data) return res.status(503).json({ error: 'No data available yet.' });
+    const deptoList = data.totales.departamentos || [];
+    const resultados = data.totales.departamentosResultados || {};
+    if (req.query.all === '1') {
+      const all = {};
+      for (const d of deptoList) {
+        if (resultados[d.ubigeo]) all[d.ubigeo] = { nombre: d.nombre, participantes: resultados[d.ubigeo] };
+      }
+      return res.json(all);
+    }
+    res.json(deptoList);
+  });
+
+  app.get('/api/departamentos/:ubigeo', (req, res) => {
+    const data = getCachedData();
+    if (!data) return res.status(503).json({ error: 'No data available yet.' });
+    const ubigeo = req.params.ubigeo;
+    const resultados = data.totales.departamentosResultados?.[ubigeo];
+    if (!resultados) return res.status(404).json({ error: 'Departamento not found' });
+    const depto = (data.totales.departamentos || []).find(d => d.ubigeo === ubigeo);
+    res.json({ ubigeo, nombre: depto?.nombre || '', participantes: resultados });
+  });
 
 async function start() {
   console.log('[server] Starting...');

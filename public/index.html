@@ -186,6 +186,128 @@
       .rest-grid { grid-template-columns: 35px 40px 1fr 70px; }
       .rest-grid > :nth-child(5), .rest-header > :nth-child(5) { display: none; }
     }
+
+    .voltereta-banner {
+      display: flex; align-items: center; gap: 1rem;
+      padding: 1rem 1.5rem; border-radius: 16px;
+      margin-bottom: 2rem; border: 2px solid;
+    }
+
+    .voltereta-icon { font-size: 1.8rem; flex-shrink: 0; }
+
+    .voltereta-body { flex: 1; min-width: 0; }
+
+    .voltereta-status { font-size: 1rem; font-weight: 900; letter-spacing: 0.5px; }
+
+    .voltereta-detail { font-size: 0.75rem; font-weight: 500; color: var(--gray-600); margin-top: 2px; }
+
+    .voltereta-progress { flex-shrink: 0; min-width: 120px; }
+
+    .voltereta-progress-label { font-size: 0.65rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.3px; color: var(--gray-500); margin-bottom: 4px; }
+
+    .voltereta-progress-bar { height: 8px; background: var(--gray-200); border-radius: 4px; overflow: hidden; }
+    .voltereta-progress-fill { height: 100%; border-radius: 4px; transition: width 1s ease-out; }
+
+    .voltereta-danger {
+      border-color: #EF4444; background: #FEF2F2;
+      animation: voltereta-pulse 1.5s ease-in-out infinite;
+    }
+    .voltereta-danger .voltereta-icon { color: #DC2626; }
+    .voltereta-danger .voltereta-status { color: #DC2626; }
+    .voltereta-danger .voltereta-progress-fill { background: linear-gradient(90deg, #EF4444, #DC2626); }
+
+    @keyframes voltereta-pulse {
+      0%,100% { box-shadow: 0 0 0 0 rgba(239,68,68,0); }
+      50% { box-shadow: 0 0 20px 4px rgba(239,68,68,0.3); }
+    }
+
+    .voltereta-warning {
+      border-color: #F59E0B; background: #FFFBEB;
+    }
+    .voltereta-warning .voltereta-icon { color: #D97706; }
+    .voltereta-warning .voltereta-status { color: #D97706; }
+    .voltereta-warning .voltereta-progress-fill { background: linear-gradient(90deg, #F59E0B, #D97706); }
+
+    .voltereta-safe {
+      border-color: #22C55E; background: #F0FDF4;
+    }
+    .voltereta-safe .voltereta-icon { color: #16A34A; }
+    .voltereta-safe .voltereta-status { color: #16A34A; }
+    .voltereta-safe .voltereta-progress-fill { background: linear-gradient(90deg, #22C55E, #16A34A); }
+
+    @media (max-width: 640px) {
+      .voltereta-banner { flex-direction: column; align-items: flex-start; gap: 0.75rem; padding: 1rem; }
+      .voltereta-progress { min-width: 100%; }
+    }
+
+    .geo-section { margin-top: 2rem; }
+
+    .geo-title {
+      font-size: 1rem; font-weight: 700; color: var(--gray-800); margin-bottom: 1rem;
+      display: flex; align-items: center; gap: 0.5rem;
+    }
+    .geo-title::before { content: ''; width: 4px; height: 18px; background: var(--onpe-blue); border-radius: 2px; }
+
+    .geo-depto-select { margin-bottom: 1rem; }
+    .geo-depto-select select {
+      width: 100%; max-width: 360px; padding: 0.6rem 1rem;
+      border: 2px solid var(--gray-200); border-radius: 10px;
+      font-family: inherit; font-size: 0.85rem; font-weight: 500;
+      background: white; color: var(--gray-800); cursor: pointer;
+      transition: border-color 0.2s;
+    }
+    .geo-depto-select select:focus { border-color: var(--onpe-blue); outline: none; }
+
+    .geo-table { background: white; border-radius: 14px; border: 1px solid var(--gray-200); overflow: hidden; }
+
+    .geo-table-header {
+      display: grid; grid-template-columns: 1fr 1.2fr 1fr 1fr 90px;
+      padding: 0.7rem 1rem; background: var(--gray-100);
+      font-size: 0.6rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.5px; color: var(--gray-500);
+      border-bottom: 1px solid var(--gray-200);
+    }
+
+    .geo-row {
+      display: grid; grid-template-columns: 1fr 1.2fr 1fr 1fr 90px;
+      padding: 0.65rem 1rem; border-bottom: 1px solid var(--gray-100);
+      align-items: center; cursor: pointer; transition: background 0.15s;
+    }
+    .geo-row:hover { background: var(--gray-50); }
+    .geo-row:last-child { border-bottom: none; }
+
+    .geo-row-danger { border-left: 3px solid #EF4444; }
+    .geo-row-warning { border-left: 3px solid #F59E0B; }
+
+    .geo-depto-name { font-size: 0.8rem; font-weight: 700; color: var(--gray-800); }
+
+    .geo-winner { display: flex; align-items: center; gap: 0.5rem; }
+    .geo-winner-photo { width: 30px; height: 30px; border-radius: 7px; object-fit: cover; background: var(--gray-200); }
+    .geo-winner-name { font-size: 0.75rem; font-weight: 600; color: var(--onpe-red); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .geo-winner-pct { font-size: 0.7rem; font-weight: 700; color: var(--onpe-red); }
+
+    .geo-2nd-name, .geo-3rd-name { font-size: 0.75rem; font-weight: 500; color: var(--gray-700); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .geo-2nd-pct, .geo-3rd-pct { font-size: 0.7rem; font-weight: 600; color: var(--gray-500); }
+
+    .geo-diff { font-size: 0.8rem; font-weight: 700; color: var(--gray-700); text-align: right; }
+    .geo-row-danger .geo-diff { color: #DC2626; }
+    .geo-row-warning .geo-diff { color: #D97706; }
+
+    .geo-back-btn {
+      display: inline-flex; align-items: center; gap: 0.4rem;
+      padding: 0.4rem 1rem; margin-bottom: 1rem;
+      background: var(--gray-100); border: 1px solid var(--gray-200);
+      border-radius: 8px; font-family: inherit; font-size: 0.75rem;
+      font-weight: 600; color: var(--gray-600); cursor: pointer;
+      transition: all 0.2s;
+    }
+    .geo-back-btn:hover { background: var(--gray-200); color: var(--gray-800); }
+
+    @media (max-width: 640px) {
+      .geo-table-header, .geo-row { grid-template-columns: 1fr 1fr 60px; }
+      .geo-table-header > :nth-child(4), .geo-row > :nth-child(4),
+      .geo-table-header > :nth-child(5), .geo-row > :nth-child(5) { display: none; }
+    }
   </style>
 </head>
 <body>
@@ -206,8 +328,10 @@
     <div id="app-content" style="display:none">
       <div id="scope-tabs"></div>
       <div class="mini-stats-row" id="summary-row"></div>
+      <div id="voltereta-section"></div>
       <div id="top3-section"></div>
       <div class="rest-section" id="rest-section"></div>
+      <div id="geo-section"></div>
     </div>
   </div>
 
@@ -216,7 +340,7 @@
   </footer>
 
   <script type="module">
-    import { fetchAllData, renderHeader, renderScopeTabs, renderMiniStats, getList, getTotales, fmt, fmtPct, fmtPctShort, fmtDiff, fmtDate, photoUrl, partyLogoUrl, setScope, getScope } from '/app.js';
+    import { fetchAllData, renderHeader, renderScopeTabs, renderMiniStats, renderVoltereta, renderGeoSection, getList, getTotales, fmt, fmtPct, fmtPctShort, fmtDiff, fmtDate, photoUrl, partyLogoUrl, setScope, getScope, setSelectedDepto, getSelectedDepto, fetchDeptoResultados } from '/app.js';
 
     function getConnectorCls(diff) {
       if (diff < 10000) return 'very-close';
@@ -328,10 +452,106 @@
 
     function renderAll() {
       renderHeader();
-      renderScopeTabs('scope-tabs', renderAll);
+      renderScopeTabs('scope-tabs', () => { setSelectedDepto(null); renderAll(); });
       renderMiniStats('summary-row', getTotales());
+      renderVoltereta('voltereta-section', getList(), getTotales());
       renderTop3();
       renderRest();
+      renderGeoSection('geo-section', handleDeptoSelect);
+    }
+
+    async function handleDeptoSelect(ubigeo) {
+      if (!ubigeo) {
+        setSelectedDepto(null);
+        renderAll();
+        return;
+      }
+      const list = await fetchDeptoResultados(ubigeo);
+      const candidates = list.filter(c => c.dniCandidato && c.nombreCandidato);
+      const sorted = [...candidates].sort((a, b) => (b.porcentajeVotosValidos || 0) - (a.porcentajeVotosValidos || 0));
+      const top3 = sorted.slice(0, 3);
+      const maxPct = top3[0]?.porcentajeVotosValidos || 1;
+      const deptoName = document.getElementById('geo-depto-dropdown')?.selectedOptions[0]?.text || '';
+
+      const ranks = ['rank-1', 'rank-2', 'rank-3'];
+      let html = `<button class="geo-back-btn" id="geo-back">&#8592; Ver Nacional</button>`;
+      html += '<div class="top3-list">';
+
+      top3.forEach((c, i) => {
+        const pct = c.porcentajeVotosValidos || 0;
+        const barW = maxPct > 0 ? (pct / maxPct * 100) : 0;
+        const diff = i > 0 ? (top3[i - 1].totalVotosValidos - c.totalVotosValidos) : null;
+        const diffPct = i > 0 ? (top3[i - 1].porcentajeVotosValidos - pct) : null;
+        const leadOver2nd = i === 0 && top3[1] ? (c.totalVotosValidos - top3[1].totalVotosValidos) : null;
+        const leadPct = i === 0 && top3[1] ? (pct - top3[1].porcentajeVotosValidos) : null;
+
+        html += `
+          <div class="candidate-card ${ranks[i]}">
+            <div class="card-main">
+              <div class="card-photo-wrap">
+                <img class="card-photo" src="${photoUrl(c.dniCandidato)}" alt="${c.nombreCandidato}" onerror="this.style.display='none'">
+                <div class="card-photo-rank">${i + 1}</div>
+              </div>
+              <div class="card-identity">
+                <div class="card-name">${c.nombreCandidato || c.nombreAgrupacionPolitica}</div>
+                <div class="card-party">
+                  ${c.nombreAgrupacionPolitica}
+                  <img class="card-party-logo" src="${partyLogoUrl(c.codigoAgrupacionPolitica)}" alt="" onerror="this.style.display='none'">
+                </div>
+              </div>
+              <div class="card-pct-wrap">
+                <div class="card-pct">${fmtPctShort(pct)}</div>
+                <div class="card-pct-label">% validos</div>
+              </div>
+            </div>
+            <div class="card-stats">
+              <div class="card-votes-block">
+                <div class="card-votes-label">Votos totales</div>
+                <div class="card-votes-total">${fmt(c.totalVotosValidos)}</div>
+                <div class="card-bar-track"><div class="card-bar-fill" style="width:${barW}%"></div></div>
+              </div>
+              <div class="card-diff-block">
+                ${i === 0 ? `
+                  <div class="card-diff-label">Ventaja sobre 2.do</div>
+                  <div class="card-diff-value">${leadOver2nd != null ? fmtDiff(leadOver2nd) : '-'}</div>
+                  <div class="card-diff-pct">${leadPct != null ? fmtPct(leadPct) + ' pts' : ''}</div>
+                ` : `
+                  <div class="card-diff-label">Diferencia con ${i}.er lugar</div>
+                  <div class="card-diff-value"><span class="diff-arrow">&#9660;</span>${fmtDiff(diff)}</div>
+                  <div class="card-diff-pct">${fmtPct(diffPct)} pts</div>
+                `}
+              </div>
+            </div>
+          </div>`;
+
+        if (i < top3.length - 1) {
+          const nextDiff = c.totalVotosValidos - (top3[i + 1]?.totalVotosValidos || 0);
+          const nextDiffPct = pct - (top3[i + 1]?.porcentajeVotosValidos || 0);
+          const cls = getConnectorCls(nextDiff);
+          html += `
+            <div class="diff-connector">
+              <div class="diff-connector-inner ${cls}">
+                <span class="arrow-down">&#9660;</span>
+                <div>
+                  <div class="diff-label-text">Diferencia ${i + 1}er vs ${i + 2}do</div>
+                  <div class="diff-text">${fmtDiff(nextDiff)} votos</div>
+                  <div class="diff-pct-text">${fmtPct(nextDiffPct)} puntos</div>
+                </div>
+              </div>
+            </div>`;
+        }
+      });
+
+      html += '</div>';
+      const section = document.getElementById('top3-section');
+      section.innerHTML = `<div style="text-align:center;font-size:0.85rem;font-weight:700;color:var(--onpe-blue);margin-bottom:1rem">Resultados en ${deptoName}</div>` + html;
+      document.getElementById('rest-section').innerHTML = '';
+
+      document.getElementById('geo-back').addEventListener('click', () => {
+        setSelectedDepto(null);
+        document.getElementById('geo-depto-dropdown').value = '';
+        renderAll();
+      });
     }
 
     async function init() {

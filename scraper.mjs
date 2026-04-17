@@ -86,6 +86,20 @@ export async function scrapeTotales(params = {}) {
       results.totales[q.key] = res.data;
     }
     
+    const deptoList = results.totales.departamentos || [];
+    if (deptoList.length > 0) {
+      console.log(`[scraper] Scraping ${deptoList.length} departamentos...`);
+      results.totales.departamentosResultados = {};
+      for (const depto of deptoList) {
+        const ubigeo = depto.ubigeo;
+        const res = await fetchAPI(
+          `/eleccion-presidencial/participantes-ubicacion-geografica-nombre?tipoFiltro=ubigeo_nivel_01&idAmbitoGeografico=1&ubigeoNivel1=${ubigeo}&idEleccion=${presiId}`
+        );
+        results.totales.departamentosResultados[ubigeo] = res.data;
+      }
+      console.log(`[scraper] Departamentos done`);
+    }
+    
     cachedData = results;
     lastScrape = new Date();
     

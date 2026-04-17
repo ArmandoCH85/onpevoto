@@ -1,0 +1,75 @@
+# ONPE Voto - Instalacion en Servidor Linux
+
+## 1. Subir a GitHub (desde la maquina actual)
+
+cd /home/senpai/scrape
+git commit -m "feat: ONPE electoral results dashboard with Playwright scraper"
+git remote add origin https://github.com/ArmandoCH85/onpevoto.git
+git branch -M main
+git push -u origin main
+
+## 2. Instalar en Servidor Linux
+
+# Clonar repo
+git clone https://github.com/ArmandoCH85/onpevoto.git
+cd onpevoto
+
+# Instalar dependencias Node
+npm install
+
+# Instalar Playwright + Chromium + dependencias del sistema
+npx playwright install chromium
+npx playwright install-deps chromium
+
+# Ejecutar (puerto 3000 por defecto)
+node server.mjs
+
+# Para usar otro puerto:
+PORT=8080 node server.mjs
+
+## 3. Correr como servicio con systemd
+
+# Crear archivo de servicio
+sudo nano /etc/systemd/system/onpevoto.service
+
+# Contenido del archivo:
+[Unit]
+Description=ONPE Voto Dashboard
+After=network.target
+
+[Service]
+Type=simple
+User=www-data
+WorkingDirectory=/home/senpai/onpevoto
+ExecStart=/usr/bin/node server.mjs
+Restart=on-failure
+RestartSec=10
+Environment=PORT=3000
+
+[Install]
+WantedBy=multi-user.target
+
+# Habilitar y arrancar
+sudo systemctl daemon-reload
+sudo systemctl enable onpevoto
+sudo systemctl start onpevoto
+
+# Ver estado
+sudo systemctl status onpevoto
+
+# Ver logs
+journalctl -u onpevoto -f
+
+## 4. Alternativa: usar PM2
+
+npm install -g pm2
+pm2 start server.mjs --name onpevoto
+pm2 save
+pm2 startup
+
+## Notas
+
+- El scraper usa Playwright con Chromium headless, necesita al menos 512MB RAM
+- img-cache/ y data.json se generan automaticamente al primer scrape
+- Scrapea cada 5 minutos automaticamente
+- El servidor corre en http://localhost:3000 por defecto
