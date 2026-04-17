@@ -1,0 +1,8 @@
+sudo mkdir -p /var/www/.cache
+sudo chown -R www-data:www-data /var/www/.cache
+sudo -u www-data npx playwright install chromium
+sudo npx playwright install-deps chromium
+sudo systemctl restart onpevoto
+
+# Verificar:
+sudo journalctl -u onpevoto --no-pager | tail -10

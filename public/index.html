@@ -212,15 +212,37 @@
 
     @media (max-width: 640px) {
       .candidate-card { padding: 1rem; }
+      .card-main { flex-wrap: wrap; }
       .card-photo { width: 60px !important; height: 60px !important; }
+      .card-identity { flex: 1; min-width: 0; }
       .card-name { font-size: 0.95rem !important; }
+      .card-pct-wrap { flex: 0 0 auto; }
       .card-pct { font-size: 1.6rem !important; }
       .rank-1 .card-pct { font-size: 2rem !important; }
       .card-stats { flex-direction: column; gap: 0.75rem; }
-      .card-diff-block { text-align: left; min-width: unset; }
+      .card-diff-block { text-align: left; min-width: unset; width: 100%; }
       .card-diff-value { font-size: 1.2rem; }
+      .diff-connector { height: 48px; }
+      .diff-connector-inner { padding: 0.4rem 1rem; gap: 0.5rem; }
+      .diff-connector .diff-text { font-size: 0.75rem; }
+      .diff-connector .diff-label-text { font-size: 0.5rem; }
       .rest-grid { grid-template-columns: 35px 40px 1fr 70px; }
       .rest-grid > :nth-child(5), .rest-header > :nth-child(5) { display: none; }
+      .card-party { flex-wrap: wrap; }
+      .card-party-logo { display: none; }
+    }
+
+    @media (max-width: 380px) {
+      .card-main { gap: 0.75rem; }
+      .card-photo { width: 48px !important; height: 48px !important; }
+      .card-pct { font-size: 1.3rem !important; }
+      .rank-1 .card-pct { font-size: 1.6rem !important; }
+      .card-pct-label { display: none; }
+      .mini-stats-row { grid-template-columns: repeat(2, 1fr); }
+      .voltereta-banner { padding: 0.75rem; }
+      .voltereta-icon { font-size: 1.3rem; }
+      .voltereta-status { font-size: 0.8rem; }
+      .voltereta-detail { font-size: 0.65rem; }
     }
 
     .voltereta-banner {
@@ -343,6 +365,15 @@
       .geo-table-header, .geo-row { grid-template-columns: 1fr 1fr 60px; }
       .geo-table-header > :nth-child(4), .geo-row > :nth-child(4),
       .geo-table-header > :nth-child(5), .geo-row > :nth-child(5) { display: none; }
+      .geo-depto-select select { max-width: 100%; }
+      .geo-winner-photo { width: 24px; height: 24px; border-radius: 5px; }
+      .geo-winner-name, .geo-2nd-name, .geo-3rd-name { font-size: 0.65rem; }
+    }
+
+    @media (max-width: 380px) {
+      .geo-table-header, .geo-row { grid-template-columns: 1fr 1fr 50px; font-size: 0.55rem; }
+      .geo-depto-name { font-size: 0.7rem; }
+      .geo-winner { gap: 0.3rem; }
     }
 
     .visitas-widget {
