@@ -1,0 +1,95 @@
+# SEO - Indexar en Google y redes sociales
+
+## Lo que ya esta hecho (en el codigo)
+
+- Meta tags SEO en las 3 paginas (title, description, keywords, canonical)
+- Open Graph tags para Facebook/WhatsApp/LinkedIn
+- Twitter Card tags
+- Structured data JSON-LD (Google Rich Results)
+- robots.txt (permite indexar todo, bloquea /api/)
+- sitemap.xml (las 3 paginas)
+
+## 1. Crear imagen OG (obligatorio para Facebook/WhatsApp)
+
+Necesitas una imagen de 1200x630px llamada og-votoperu.png
+
+Opciones:
+- Canva.com (gratis): crear imagen 1200x630 con titulo "Resultados Elecciones Peru 2026" + logo
+- En el servidor: usar la captura de pantalla del sitio
+
+Subirla al servidor:
+  sudo mkdir -p /opt/onpevoto/public/img
+  sudo cp og-votoperu.png /opt/onpevoto/public/img/
+  sudo chown -R www-data:www-data /opt/onpevoto
+
+Verificar:
+  curl -I https://www.votoperu.site/img/og-votoperu.png
+
+## 2. Registrar en Google Search Console (CRITICO)
+
+1. Ir a https://search.google.com/search-console
+2. Click "Agregar propiedad"
+3. Ingresar: https://www.votoperu.site
+4. Verificar dominio (opcion DNS o archivo HTML):
+
+   Opcion A - Archivo HTML (mas facil):
+   - Google te da un codigo como google1234abcd.html
+   - Crear el archivo: sudo nano /opt/onpevoto/public/google1234abcd.html
+   - Poner el contenido que Google te da
+   - sudo chown www-data:www-data /opt/onpevoto/public/google1234abcd.html
+   - Click "Verificar" en Google
+
+   Opcion B - Registro DNS TXT:
+   - En tu panel de DNS agregar registro TXT que Google te indica
+   - Click "Verificar"
+
+5. Una vez verificado, enviar el sitemap:
+   - En Search Console ir a "Sitemaps"
+   - Ingresar: https://www.votoperu.site/sitemap.xml
+   - Click "Enviar"
+
+6. Pedir indexacion manual (mas rapido):
+   - En Search Console, barra superior ingresar cada URL:
+     - https://www.votoperu.site/
+     - https://www.votoperu.site/candidatos.html
+     - https://www.votoperu.site/resumen.html
+   - Click "Solicitar indexacion"
+
+## 3. Verificar Open Graph (Facebook/WhatsApp)
+
+Probar con estas herramientas:
+- https://developers.facebook.com/tools/debug/ (Facebook Debugger)
+- https://cards-dev.twitter.comvalidator (Twitter Card Validator)
+- https://www.opengraph.xyz/ (preview general)
+
+Ingresar https://www.votoperu.site y verificar que muestra titulo, descripcion e imagen.
+
+## 4. Acelerar indexacion
+
+- Compartir el link en redes sociales (cada share genera un crawl)
+- Postear en foros peruanos: peru21, larepublica comentarios, reddit r/peru
+- Si tenes Twitter/X, twittear el link
+- Crear un post en Facebook con el link
+- Cada vez que alguien comparte, Google y Facebook lo detectan
+
+## 5. Google Analytics (opcional, para ver trafico real)
+
+1. Ir a https://analytics.google.com/
+2. Crear propiedad para votoperu.site
+3. Obtener el codigo de seguimiento (gtag.js)
+4. Agregar en server.mjs antes de app.listen:
+
+   O crear archivo /opt/onpevoto/public/analytics.js con el codigo de Google
+   Y agregar <script src="/analytics.js"></script> en cada HTML antes de </head>
+
+## 6. Verificar que todo funciona
+
+  # Sitemap accesible
+  curl https://www.votoperu.site/sitemap.xml
+
+  # Robots.txt accesible
+  curl https://www.votoperu.site/robots.txt
+
+  # Meta tags correctos
+  curl -s https://www.votoperu.site/ | grep og:title
+  curl -s https://www.votoperu.site/ | grep canonical
