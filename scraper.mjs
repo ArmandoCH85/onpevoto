@@ -30,7 +30,8 @@ async function initBrowser() {
 
 async function fetchAPI(path) {
   if (!page) throw new Error('Browser not initialized');
-  const url = `${BASE}${path}`;
+  const sep = path.includes('?') ? '&' : '?';
+  const url = `${BASE}${path}${sep}_t=${Date.now()}`;
   const result = await page.evaluate(async (u) => {
     try {
       const r = await fetch(u, { headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' } });

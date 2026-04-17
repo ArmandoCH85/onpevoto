@@ -1,0 +1,1 @@
+cd /opt/onpevoto && sudo git pull && sudo systemctl restart onpevoto
