@@ -113,10 +113,12 @@ body {
 .scope-tab {
   padding: 0.5rem 1.25rem; font-size: 0.8rem; font-weight: 600;
   color: var(--gray-500); cursor: pointer; border-radius: 8px;
-  border: none; background: none; transition: all 0.2s; font-family: inherit;
+  border: none; background: none; transition: color 0.2s, background 0.2s, box-shadow 0.2s; font-family: inherit;
 }
 
 .scope-tab:hover { color: var(--gray-700); }
+
+.scope-tab:focus-visible { outline: 3px solid var(--onpe-blue); outline-offset: 2px; }
 
 .scope-tab.active {
   background: var(--onpe-red); color: white;
@@ -170,6 +172,7 @@ body {
   border: none; border-radius: 8px;
   font-family: inherit; font-weight: 600; cursor: pointer;
 }
+.retry-btn:focus-visible { outline: 3px solid var(--onpe-red); outline-offset: 3px; }
 
 .app-footer {
   text-align: center; padding: 2rem;

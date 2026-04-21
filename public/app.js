@@ -56,6 +56,8 @@ export function getTotales(scope) {
   if (s === 'extranjero') return t.extranjero;
   return t.nacional;
 }
+export function getPeruData() { return appData?.totales?.peru || null; }
+export function getExtData() { return appData?.totales?.extranjero || null; }
 
 export const fmt = (n) => n == null ? '-' : Math.round(n).toLocaleString('es-PE');
 export const fmtPct = (n) => n == null ? '-' : Number(n).toFixed(3) + '%';
@@ -170,6 +172,7 @@ export function renderVoltereta(containerId, list, t) {
 }
 
 export function getDepartamentos() { return departamentos; }
+export function getDeptoCache() { return deptoResultadosCache; }
 export function getSelectedDepto() { return selectedDepto; }
 export function setSelectedDepto(ubigeo) { selectedDepto = ubigeo; }
 
@@ -404,4 +407,321 @@ function generateShareImage(list) {
   link.download = 'resultados-elecciones-2026.png';
   link.href = canvas.toDataURL('image/png');
   link.click();
+}
+
+// ─── Projection / Scenario Functions ────────────────────────────────────────
+
+/**
+ * Filter valid candidates from participantes array.
+ * Excludes blanks, nulos, impugnados, TOTAL, and any entry missing dniCandidato or nombreCandidato.
+ */
+export function filterValidCandidates(participantes) {
+  if (!participantes) return [];
+  return participantes.filter(c =>
+    c.dniCandidato && c.nombreCandidato &&
+    !['VOTOS EN BLANCO','VOTOS NULOS','VOTOS IMPUGNADOS','TOTAL'].includes(c.nombreCandidato)
+  );
+}
+
+/**
+ * Calculate pending votes based on unprocessed actas.
+ * Formula: actasPendientes × (totalVotosEmitidos / contabilizadas)
+ * Guards against division by zero when contabilizadas === 0.
+ */
+export function calculatePendingVotes(totales) {
+  if (!totales) return 0;
+  const contabilizadas = Number(totales.contabilizadas) || 0;
+  const totalActas = Number(totales.totalActas) || 0;
+  const totalVotosEmitidos = Number(totales.totalVotosEmitidos) || 0;
+  if (contabilizadas === 0) return 0;
+  const actasPendientes = totalActas - contabilizadas;
+  const promedioVotosPorActa = totalVotosEmitidos / contabilizadas;
+  return Math.round(actasPendientes * promedioVotosPorActa);
+}
+
+/**
+ * Neutral scenario: distribute pending votes proportionally by current vote share.
+ */
+export function projectNeutral(candidates, pending) {
+  const sum = candidates.reduce((acc, c) => acc + (c.totalVotosValidos || 0), 0);
+  return candidates.map(c => ({
+    ...c,
+    proyectado: Math.round((c.totalVotosValidos || 0) + pending * ((c.totalVotosValidos || 0) / sum))
+  }));
+}
+
+/**
+ * Optimista scenario: 1st unchanged, 2nd gets 60% of pending, 3rd gets 40%.
+ */
+export function projectOptimista(candidates, pending) {
+  const sum = candidates.reduce((acc, c) => acc + (c.totalVotosValidos || 0), 0);
+  return candidates.map((c, i) => {
+    if (i === 0) return { ...c, proyectado: c.totalVotosValidos || 0 };
+    if (i === 1) {
+      const base = (c.totalVotosValidos || 0) / sum;
+      const bonus = base * 0.25;
+      return { ...c, proyectado: Math.round((c.totalVotosValidos || 0) + pending * (base + bonus)) };
+    }
+    if (i === 2) {
+      const base = (c.totalVotosValidos || 0) / sum;
+      const bonus = base * 0.25;
+      return { ...c, proyectado: Math.round((c.totalVotosValidos || 0) + pending * (base - bonus)) };
+    }
+    return { ...c, proyectado: c.totalVotosValidos || 0 };
+  });
+}
+
+/**
+ * Pesimista scenario: 1st unchanged, 2nd gets 40% of pending, 3rd gets 60%.
+ */
+export function projectPesimista(candidates, pending) {
+  const sum = candidates.reduce((acc, c) => acc + (c.totalVotosValidos || 0), 0);
+  return candidates.map((c, i) => {
+    if (i === 0) return { ...c, proyectado: c.totalVotosValidos || 0 };
+    if (i === 1) {
+      const base = (c.totalVotosValidos || 0) / sum;
+      const bonus = base * 0.25;
+      return { ...c, proyectado: Math.round((c.totalVotosValidos || 0) + pending * (base - bonus)) };
+    }
+    if (i === 2) {
+      const base = (c.totalVotosValidos || 0) / sum;
+      const bonus = base * 0.25;
+      return { ...c, proyectado: Math.round((c.totalVotosValidos || 0) + pending * (base + bonus)) };
+    }
+    return { ...c, proyectado: c.totalVotosValidos || 0 };
+  });
+}
+
+/**
+ * Departmental apportionment: Neutral scenario.
+ * Splits pending votes into Peru and Extranjero, then distributes each
+ * across departments (Peru) or as one block (Extranjero) based on
+ * each candidate's local performance.
+ */
+export function projectDeptoNeutral(top3, pending, deptoCache, allDepts, nationalTotalValid, peruData, extData) {
+  const projections = top3.map(c => ({ ...c, proyectado: c.totalVotosValidos || 0 }));
+  if (!nationalTotalValid || nationalTotalValid <= 0) return projections;
+
+  const peValid = peruData?.totalVotosValidos || 0;
+  const extValid = extData?.totalVotosValidos || 0;
+  const contP = Number(peruData?.contabilizadas) || 0;
+  const contE = Number(extData?.contabilizadas) || 0;
+  const totalP = Number(peruData?.totalActas) || 0;
+  const totalE = Number(extData?.totalActas) || 0;
+  const emitP = Number(peruData?.totalVotosEmitidos) || 0;
+  const emitE = Number(extData?.totalVotosEmitidos) || 0;
+
+  const pendingPeru = contP > 0 ? Math.round((totalP - contP) * (emitP / contP)) : 0;
+  const pendingExt = contE > 0 ? Math.round((totalE - contE) * (emitE / contE)) : 0;
+
+  const filterValid = (list) => (list || []).filter(c =>
+    c.dniCandidato && c.nombreCandidato &&
+    !['VOTOS EN BLANCO','VOTOS NULOS','VOTOS IMPUGNADOS','TOTAL'].includes(c.nombreCandidato)
+  );
+
+  // Peru: distribute across departments
+  if (pendingPeru > 0) {
+    for (const dept of allDepts) {
+      const deptParticipantes = deptoCache[dept.ubigeo] || [];
+      const valid = filterValid(deptParticipantes);
+      if (!valid.length) continue;
+      const deptTotalValid = valid.reduce((sum, c) => sum + (c.totalVotosValidos || 0), 0);
+      if (deptTotalValid <= 0) continue;
+      const deptPending = pendingPeru * (deptTotalValid / peValid);
+
+      for (let i = 0; i < top3.length; i++) {
+        const candidate = top3[i];
+        const deptResult = valid.find(p => p.dniCandidato === candidate.dniCandidato);
+        const candidateDeptoVotes = deptResult ? (deptResult.totalVotosValidos || 0) : 0;
+        const share = candidateDeptoVotes / deptTotalValid;
+        projections[i].proyectado += Math.round(deptPending * share);
+      }
+    }
+  }
+
+  // Extranjero: distribute as one block
+  if (pendingExt > 0 && extValid > 0) {
+    const extParticipantes = (extData?.participantesExtranjero) ||
+      (typeof getList === 'function' ? [] : []);
+    // Try to get from appData if available
+    const extList = appData?.participantesExtranjero || [];
+    const validExt = filterValid(extList);
+    const extTotalValid = validExt.reduce((sum, c) => sum + (c.totalVotosValidos || 0), 0);
+    if (extTotalValid > 0) {
+      for (let i = 0; i < top3.length; i++) {
+        const candidate = top3[i];
+        const extResult = validExt.find(p => p.dniCandidato === candidate.dniCandidato);
+        const candidateExtVotes = extResult ? (extResult.totalVotosValidos || 0) : 0;
+        const share = candidateExtVotes / extTotalValid;
+        projections[i].proyectado += Math.round(pendingExt * share);
+      }
+    }
+  }
+
+  return projections;
+}
+
+/**
+ * Departmental apportionment: Optimista for 2nd place.
+ * Boost 2nd place's share by 25% in each department and extranjero.
+ */
+export function projectDeptoOptimista(top3, pending, deptoCache, allDepts, nationalTotalValid, peruData, extData) {
+  const projections = top3.map(c => ({ ...c, proyectado: c.totalVotosValidos || 0 }));
+  if (!nationalTotalValid || nationalTotalValid <= 0) return projections;
+
+  const peValid = peruData?.totalVotosValidos || 0;
+  const extValid = extData?.totalVotosValidos || 0;
+  const contP = Number(peruData?.contabilizadas) || 0;
+  const contE = Number(extData?.contabilizadas) || 0;
+  const totalP = Number(peruData?.totalActas) || 0;
+  const totalE = Number(extData?.totalActas) || 0;
+  const emitP = Number(peruData?.totalVotosEmitidos) || 0;
+  const emitE = Number(extData?.totalVotosEmitidos) || 0;
+
+  const pendingPeru = contP > 0 ? Math.round((totalP - contP) * (emitP / contP)) : 0;
+  const pendingExt = contE > 0 ? Math.round((totalE - contE) * (emitE / contE)) : 0;
+
+  const filterValid = (list) => (list || []).filter(c =>
+    c.dniCandidato && c.nombreCandidato &&
+    !['VOTOS EN BLANCO','VOTOS NULOS','VOTOS IMPUGNADOS','TOTAL'].includes(c.nombreCandidato)
+  );
+
+  if (pendingPeru > 0) {
+    for (const dept of allDepts) {
+      const deptParticipantes = deptoCache[dept.ubigeo] || [];
+      const valid = filterValid(deptParticipantes);
+      if (!valid.length) continue;
+      const deptTotalValid = valid.reduce((sum, c) => sum + (c.totalVotosValidos || 0), 0);
+      if (deptTotalValid <= 0) continue;
+      const deptPending = pendingPeru * (deptTotalValid / peValid);
+
+      const shares = top3.map(candidate => {
+        const deptResult = valid.find(p => p.dniCandidato === candidate.dniCandidato);
+        return deptResult ? (deptResult.totalVotosValidos || 0) / deptTotalValid : 0;
+      });
+
+      const bonus = shares[1] * 0.25;
+      const adjusted = [shares[0], shares[1] + bonus, shares[2] - bonus];
+
+      for (let i = 0; i < top3.length; i++) {
+        projections[i].proyectado += Math.round(deptPending * adjusted[i]);
+      }
+    }
+  }
+
+  if (pendingExt > 0 && extValid > 0) {
+    const extList = appData?.participantesExtranjero || [];
+    const validExt = filterValid(extList);
+    const extTotalValid = validExt.reduce((sum, c) => sum + (c.totalVotosValidos || 0), 0);
+    if (extTotalValid > 0) {
+      const shares = top3.map(candidate => {
+        const extResult = validExt.find(p => p.dniCandidato === candidate.dniCandidato);
+        return extResult ? (extResult.totalVotosValidos || 0) / extTotalValid : 0;
+      });
+
+      const bonus = shares[1] * 0.25;
+      const adjusted = [shares[0], shares[1] + bonus, shares[2] - bonus];
+
+      for (let i = 0; i < top3.length; i++) {
+        projections[i].proyectado += Math.round(pendingExt * adjusted[i]);
+      }
+    }
+  }
+
+  return projections;
+}
+
+/**
+ * Departmental apportionment: Pesimista for 2nd place (= optimista for 3rd).
+ * Boost 3rd place's share by 25% in each department and extranjero.
+ */
+export function projectDeptoPesimista(top3, pending, deptoCache, allDepts, nationalTotalValid, peruData, extData) {
+  const projections = top3.map(c => ({ ...c, proyectado: c.totalVotosValidos || 0 }));
+  if (!nationalTotalValid || nationalTotalValid <= 0) return projections;
+
+  const peValid = peruData?.totalVotosValidos || 0;
+  const extValid = extData?.totalVotosValidos || 0;
+  const contP = Number(peruData?.contabilizadas) || 0;
+  const contE = Number(extData?.contabilizadas) || 0;
+  const totalP = Number(peruData?.totalActas) || 0;
+  const totalE = Number(extData?.totalActas) || 0;
+  const emitP = Number(peruData?.totalVotosEmitidos) || 0;
+  const emitE = Number(extData?.totalVotosEmitidos) || 0;
+
+  const pendingPeru = contP > 0 ? Math.round((totalP - contP) * (emitP / contP)) : 0;
+  const pendingExt = contE > 0 ? Math.round((totalE - contE) * (emitE / contE)) : 0;
+
+  const filterValid = (list) => (list || []).filter(c =>
+    c.dniCandidato && c.nombreCandidato &&
+    !['VOTOS EN BLANCO','VOTOS NULOS','VOTOS IMPUGNADOS','TOTAL'].includes(c.nombreCandidato)
+  );
+
+  if (pendingPeru > 0) {
+    for (const dept of allDepts) {
+      const deptParticipantes = deptoCache[dept.ubigeo] || [];
+      const valid = filterValid(deptParticipantes);
+      if (!valid.length) continue;
+      const deptTotalValid = valid.reduce((sum, c) => sum + (c.totalVotosValidos || 0), 0);
+      if (deptTotalValid <= 0) continue;
+      const deptPending = pendingPeru * (deptTotalValid / peValid);
+
+      const shares = top3.map(candidate => {
+        const deptResult = valid.find(p => p.dniCandidato === candidate.dniCandidato);
+        return deptResult ? (deptResult.totalVotosValidos || 0) / deptTotalValid : 0;
+      });
+
+      const bonus = shares[2] * 0.25;
+      const adjusted = [shares[0], shares[1] - bonus, shares[2] + bonus];
+
+      for (let i = 0; i < top3.length; i++) {
+        projections[i].proyectado += Math.round(deptPending * adjusted[i]);
+      }
+    }
+  }
+
+  if (pendingExt > 0 && extValid > 0) {
+    const extList = appData?.participantesExtranjero || [];
+    const validExt = filterValid(extList);
+    const extTotalValid = validExt.reduce((sum, c) => sum + (c.totalVotosValidos || 0), 0);
+    if (extTotalValid > 0) {
+      const shares = top3.map(candidate => {
+        const extResult = validExt.find(p => p.dniCandidato === candidate.dniCandidato);
+        return extResult ? (extResult.totalVotosValidos || 0) / extTotalValid : 0;
+      });
+
+      const bonus = shares[2] * 0.25;
+      const adjusted = [shares[0], shares[1] - bonus, shares[2] + bonus];
+
+      for (let i = 0; i < top3.length; i++) {
+        projections[i].proyectado += Math.round(pendingExt * adjusted[i]);
+      }
+    }
+  }
+
+  return projections;
+}
+
+/**
+ * Identify departments where 2nd-3rd place gap is below threshold.
+ * Classifies as swing-critical (<10k) or swing-tight (<threshold).
+ * Returns sorted by gap ascending.
+ */
+export function identifySwingDepartments(deptos, threshold = 50000) {
+  const result = [];
+  for (const depto of deptos) {
+    const list = deptoResultadosCache[depto.ubigeo] || [];
+    const valid = filterValidCandidates(list);
+    const sorted = [...valid].sort((a, b) => (b.porcentajeVotosValidos || 0) - (a.porcentajeVotosValidos || 0));
+    if (sorted.length < 2) continue;
+    const gap = Math.abs((sorted[1].totalVotosValidos || 0) - (sorted[2].totalVotosValidos || 0));
+    if (gap < threshold) {
+      result.push({
+        ubigeo: depto.ubigeo,
+        nombre: depto.nombre,
+        gap,
+        diffClass: gap < 10000 ? 'swing-critical' : 'swing-tight'
+      });
+    }
+  }
+  return result.sort((a, b) => a.gap - b.gap);
 }

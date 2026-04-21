@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es-PE" data-page="top3">
+<html lang="es-PE" data-page="top3" style="color-scheme: dark">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -26,7 +26,7 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/shared.css">
   <script src="/header.js"></script>
   <script type="module" src="/app.js"></script>
@@ -71,145 +71,210 @@
     }
   }
   </script>
-  <style>
-    .top3-list { display: flex; flex-direction: column; gap: 0; margin-bottom: 2rem; }
 
-    .candidate-card {
-      background: white; border-radius: 20px;
-      padding: 1.5rem 2rem; border: 2px solid var(--gray-200);
+  <style>
+    /* ── Ticker Bar ──────────────────────────────────────────────── */
+    .ticker-bar {
+      background: #0a0a0a;
+      color: white; overflow: hidden; position: relative;
+      height: 38px; display: flex; align-items: center;
+      border-bottom: 3px solid #C41E3A;
+    }
+    .ticker-badge {
+      flex-shrink: 0; background: #C41E3A; color: white;
+      padding: 0 0.9rem; font-size: 0.6rem; font-weight: 900;
+      text-transform: uppercase; letter-spacing: 2px; height: 100%;
+      display: flex; align-items: center; gap: 0.4rem; z-index: 2;
+      font-family: 'Space Grotesk', sans-serif;
+    }
+    .ticker-badge::before {
+      content: ''; width: 6px; height: 6px; border-radius: 50%;
+      background: white; animation: live-dot 1.2s ease-in-out infinite;
+    }
+    @keyframes live-dot {
+      0%,100%{ opacity: 1; } 50%{ opacity: 0.3; }
+    }
+    .ticker-scroll {
+      flex: 1; overflow: hidden; white-space: nowrap; position: relative;
+      mask-image: linear-gradient(90deg, transparent, black 5%, black 95%, transparent);
+      -webkit-mask-image: linear-gradient(90deg, transparent, black 5%, black 95%, transparent);
+    }
+    .ticker-text {
+      display: inline-block; animation: ticker 40s linear infinite;
+      font-size: 0.75rem; font-weight: 600; padding-left: 2rem;
+      font-family: 'Space Grotesk', sans-serif;
+      letter-spacing: 0.3px;
+    }
+    .ticker-text span { margin-right: 2.5rem; }
+    .ticker-text .t-highlight { color: #C41E3A; font-weight: 800; }
+    .ticker-text .t-dot { color: rgba(255,255,255,0.25); margin: 0 0.3rem; }
+    .ticker-text .t-pct { color: rgba(255,255,255,0.55); font-weight: 500; }
+    @keyframes ticker { 0%{transform:translateX(0)} 100%{transform:translateX(-50%)} }
+    @media (prefers-reduced-motion: reduce) {
+      .ticker-text { animation: none; }
+    }
+
+    /* ── CTA Pill ──────────────────────────────────────────────── */
+    .cta-pill {
+      text-align: center; margin: 1.5rem 0 0.5rem;
+    }
+    .cta-pill-inner {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      background: linear-gradient(135deg, #e94560, #c41e3a);
+      color: white; padding: 0.6rem 1.5rem; border-radius: 100px;
+      font-size: 0.82rem; font-weight: 700; letter-spacing: 0.5px;
+      box-shadow: 0 4px 20px rgba(233,69,96,0.3);
+      animation: cta-pulse 2.5s ease-in-out infinite;
+    }
+    .cta-pill-inner svg { width: 16px; height: 16px; fill: white; }
+    @keyframes cta-pulse {
+      0%,100%{ box-shadow: 0 4px 20px rgba(233,69,96,0.3); }
+      50%{ box-shadow: 0 4px 30px rgba(233,69,96,0.6); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .cta-pill-inner { animation: none; }
+    }
+
+/* ── Duel HERO ─────────────────────────────────────────────── */
+    .duel-section { margin: 1rem 0 0; }
+    .duel-hero {
+      background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+      border-radius: 24px; padding: 1.75rem 1.5rem 1.5rem;
+      position: relative; overflow: hidden;
+      box-shadow: 0 12px 48px rgba(15,12,41,0.4);
+    }
+    .duel-hero-close {
+      box-shadow: 0 12px 48px rgba(233,69,96,0.3);
+      animation: duel-pulse 2s ease-in-out infinite;
+    }
+    @keyframes duel-pulse {
+      0%,100%{ box-shadow: 0 12px 48px rgba(233,69,96,0.3); }
+      50%{ box-shadow: 0 12px 64px rgba(233,69,96,0.6); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .duel-hero-close { animation: none; }
+    }
+    .duel-hero-label {
+      text-align: center; font-family: 'Space Grotesk', sans-serif;
+      font-size: 0.85rem; font-weight: 700; color: rgba(255,255,255,0.7);
+      text-transform: uppercase; letter-spacing: 2px; margin-bottom: 1.25rem;
+    }
+    .duel-hero-close .duel-hero-label { color: #e94560; }
+    .duel-hero-grid {
+      display: grid; grid-template-columns: 1fr auto 1fr; gap: 0;
+      align-items: stretch;
+    }
+
+    .duel-hero-card {
+      background: rgba(255,255,255,0.06); backdrop-filter: blur(10px);
+      border: 2px solid rgba(255,255,255,0.1); border-radius: 20px;
+      padding: 1.25rem; text-align: center; position: relative;
+      transition: background 0.3s, border-color 0.3s;
+    }
+    .duel-hero-card:hover { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.2); }
+    .duel-hero-card:focus-visible { outline: 3px solid #e94560; outline-offset: 3px; }
+    .duel-hero-card-2 { border-color: rgba(96,125,139,0.5); }
+    .duel-hero-card-3 { border-color: rgba(141,110,99,0.5); }
+
+    .dhc-badge {
+      position: absolute; top: -1px; left: 50%; transform: translateX(-50%);
+      padding: 0.2rem 0.8rem; border-radius: 0 0 10px 10px;
+      font-family: 'Space Grotesk', sans-serif; font-size: 0.7rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 1px; color: white;
+    }
+    .duel-hero-card-2 .dhc-badge { background: var(--silver); }
+    .duel-hero-card-3 .dhc-badge { background: var(--bronze); }
+
+    .dhc-photo {
+      width: 80px; height: 80px; border-radius: 50%; object-fit: cover; margin: 0.75rem auto 0.5rem;
+      display: block; border: 3px solid rgba(255,255,255,0.2);
+    }
+    .duel-hero-card-2 .dhc-photo { border-color: var(--silver); }
+    .duel-hero-card-3 .dhc-photo { border-color: var(--bronze); }
+
+    .dhc-party-logo {
+      position: absolute; top: 46px; right: 12px;
+      width: 24px; height: 24px; border-radius: 5px; object-fit: cover;
+      border: 2px solid rgba(255,255,255,0.15);
+    }
+    .dhc-name {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 0.95rem; font-weight: 700; color: white; line-height: 1.2;
+    }
+    .dhc-party { font-size: 0.65rem; color: rgba(255,255,255,0.5); margin-top: 2px; }
+    .dhc-pct {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 2.5rem; font-weight: 700; color: white; line-height: 1; margin-top: 0.75rem;
+    }
+    .duel-hero-card-2 .dhc-pct { color: #B0BEC5; }
+    .duel-hero-card-3 .dhc-pct { color: #BCAAA4; }
+    .dhc-bar-track {
+      height: 8px; background: rgba(255,255,255,0.1); border-radius: 4px;
+      overflow: hidden; margin: 0.6rem auto 0; max-width: 200px;
+    }
+    .dhc-bar-fill { height: 100%; border-radius: 4px; transition: width 1s ease-out; }
+    .dhc-bar-silver { background: linear-gradient(90deg, #607D8B, #90A4AE); }
+    .dhc-bar-bronze { background: linear-gradient(90deg, #8D6E63, #A1887F); }
+    .dhc-votes { font-size: 0.75rem; color: rgba(255,255,255,0.5); margin-top: 0.35rem; font-weight: 600; }
+
+    /* VS Center */
+    .duel-hero-vs {
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      padding: 0 0.75rem; min-width: 90px;
+    }
+    .dhvs-circle {
+      width: 52px; height: 52px; border-radius: 50%;
+      background: linear-gradient(135deg, #e94560, #c41e3a);
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.2rem; font-weight: 800; color: white;
+      box-shadow: 0 4px 20px rgba(233,69,96,0.5);
+    }
+    .dhvs-gap { text-align: center; margin-top: 0.75rem; }
+    .dhvs-gap-value {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.3rem; font-weight: 800; color: #e94560; line-height: 1;
+    }
+    .dhvs-gap-label { font-size: 0.6rem; color: rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: 0.5px; margin-top: 2px; }
+    .dhvs-gap-pct { font-size: 0.75rem; font-weight: 700; color: rgba(255,255,255,0.6); }
+
+    /* ── First Place Strip ───────────────────────────────────────── */
+    .first-strip {
+      display: flex; align-items: center; gap: 0.75rem;
+      background: #0a0a0a;
+      border-radius: 14px; padding: 0.85rem 1.25rem;
+      margin-top: 1rem;
+      border: 1px solid rgba(212,160,23,0.4);
       position: relative; overflow: hidden;
     }
-
-    .candidate-card.rank-1 {
-      border-color: var(--gold);
-      box-shadow: 0 0 30px var(--gold-glow), 0 8px 32px rgba(0,0,0,0.08);
+    .first-strip::before {
+      content: ''; position: absolute; left: 0; top: 0; bottom: 0;
+      width: 4px; background: linear-gradient(180deg, #D4A017, #f0c040, #D4A017);
     }
-
-    .candidate-card.rank-2 {
-      border-color: var(--silver);
-      box-shadow: 0 0 20px var(--silver-glow), 0 4px 16px rgba(0,0,0,0.06);
-    }
-
-    .candidate-card.rank-3 {
-      border-color: var(--bronze);
-      box-shadow: 0 0 20px var(--bronze-glow), 0 4px 16px rgba(0,0,0,0.06);
-    }
-
-    .card-main { display: flex; gap: 1.25rem; align-items: center; }
-
-    .card-photo-wrap { position: relative; flex-shrink: 0; }
-
-    .card-photo {
-      width: 80px; height: 80px; border-radius: 16px;
-      object-fit: cover; background: var(--gray-200); display: block;
-    }
-
-    .rank-1 .card-photo { width: 100px; height: 100px; border-radius: 20px; }
-
-    .card-photo-rank {
-      position: absolute; bottom: -6px; right: -6px;
-      width: 30px; height: 30px; border-radius: 10px;
+    .fs-rank {
+      width: 30px; height: 30px; border-radius: 50%; flex-shrink: 0;
+      background: #0a0a0a; border: 2px solid #D4A017;
       display: flex; align-items: center; justify-content: center;
-      font-size: 0.85rem; font-weight: 900; color: white;
-      border: 3px solid white;
+      font-size: 0.7rem; font-weight: 900; color: #D4A017;
+      font-family: 'Space Grotesk', sans-serif;
+    }
+    .fs-photo { width: 38px; height: 38px; border-radius: 10px; object-fit: cover; border: 2px solid #D4A01740; flex-shrink: 0; }
+    .fs-info { flex: 1; min-width: 0; }
+    .fs-name { font-family: 'Space Grotesk', sans-serif; font-size: 0.85rem; font-weight: 700; color: white; letter-spacing: 0.3px; }
+    .fs-party { font-size: 0.58rem; color: rgba(255,255,255,0.4); font-family: 'Space Grotesk', sans-serif; }
+    .fs-pct { font-family: 'Space Grotesk', sans-serif; font-size: 1.6rem; font-weight: 800; color: #D4A017; line-height: 1; flex-shrink: 0; letter-spacing: -1px; }
+    .fs-lead {
+      font-size: 0.6rem; font-weight: 700; color: #C41E3A;
+      background: rgba(196,30,58,0.15); border: 1px solid rgba(196,30,58,0.3);
+      padding: 0.2rem 0.55rem; border-radius: 20px; flex-shrink: 0; white-space: nowrap;
+      font-family: 'Space Grotesk', sans-serif;
     }
 
-    .rank-1 .card-photo-rank { background: var(--gold); width: 34px; height: 34px; border-radius: 12px; }
-    .rank-2 .card-photo-rank { background: var(--silver); }
-    .rank-3 .card-photo-rank { background: var(--bronze); }
+    /* ── Pagination Dots ───────────────────────────────────────── */
+    .duel-dots { display: none; }
 
-    .card-identity { flex: 1; min-width: 0; }
-
-    .card-name { font-size: 0.95rem; font-weight: 800; color: var(--gray-900); line-height: 1.2; }
-    .rank-1 .card-name { font-size: 1.1rem; }
-
-    .card-party { font-size: 0.7rem; font-weight: 500; color: var(--gray-600); margin-top: 2px; display: flex; align-items: center; gap: 0.5rem; }
-
-    .card-party-logo { height: 22px; width: auto; border-radius: 3px; }
-
-    .card-pct-wrap { text-align: right; flex-shrink: 0; }
-
-    .card-pct { font-size: 1.8rem; font-weight: 900; color: var(--onpe-red); line-height: 1; }
-    .rank-1 .card-pct { font-size: 2.2rem; }
-
-    .card-pct-label { font-size: 0.55rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: var(--gray-500); margin-top: 2px; }
-
-    .card-stats {
-      display: flex; gap: 1.5rem; margin-top: 1rem;
-      padding-top: 1rem; border-top: 1px solid var(--gray-200);
-      align-items: center;
-    }
-
-    .card-votes-block { flex: 1; }
-
-    .card-votes-total { font-size: 1rem; font-weight: 800; color: var(--gray-900); }
-    .rank-1 .card-votes-total { font-size: 1.1rem; }
-
-    .card-votes-label { font-size: 0.6rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.3px; color: var(--gray-500); }
-
-    .card-bar-track { height: 10px; background: var(--gray-200); border-radius: 5px; overflow: hidden; margin-top: 0.5rem; }
-    .rank-1 .card-bar-track { height: 14px; }
-
-    .card-bar-fill { height: 100%; border-radius: 5px; transition: width 1s ease-out; }
-    .rank-1 .card-bar-fill { background: linear-gradient(90deg, var(--gold), #F0C040); }
-    .rank-2 .card-bar-fill { background: linear-gradient(90deg, var(--silver), #90A4AE); }
-    .rank-3 .card-bar-fill { background: linear-gradient(90deg, var(--bronze), #A1887F); }
-
-    .card-diff-block { text-align: center; flex-shrink: 0; min-width: 120px; padding: 0.5rem 0; }
-
-    .card-diff-label { font-size: 0.55rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.3px; color: var(--gray-500); margin-bottom: 0.15rem; }
-
-    .card-diff-value { font-size: 1.3rem; font-weight: 900; color: var(--onpe-red); line-height: 1; }
-    .card-diff-pct { font-size: 0.65rem; font-weight: 600; color: var(--onpe-red); opacity: 0.8; }
-
-    .rank-1 .card-diff-value { font-size: 0.8rem; color: #16A34A; font-weight: 700; }
-    .rank-1 .card-diff-pct { color: #16A34A; }
-
-    .diff-arrow { font-size: 0.9rem; margin-right: 0.15rem; }
-
-    .diff-connector {
-      display: flex; align-items: center; justify-content: center;
-      padding: 0; position: relative; height: 56px;
-      background: linear-gradient(180deg, var(--gray-100), var(--gray-50), var(--gray-100));
-    }
-
-    .diff-connector-inner {
-      display: flex; align-items: center; gap: 1rem;
-      background: white; border: 2px solid var(--onpe-red);
-      padding: 0.5rem 1.5rem; border-radius: 100px;
-      box-shadow: 0 4px 16px rgba(196,30,58,0.15);
-      position: relative; z-index: 1;
-    }
-
-    .diff-connector-inner.close {
-      border-color: #F59E0B; background: #FFFBEB;
-      box-shadow: 0 4px 16px rgba(245,158,11,0.2);
-    }
-
-    .diff-connector-inner.very-close {
-      border-color: #EF4444; background: #FEF2F2;
-      box-shadow: 0 4px 24px rgba(239,68,68,0.3);
-      animation: glow 1.5s ease-in-out infinite;
-    }
-
-    @keyframes glow {
-      0%,100% { box-shadow: 0 4px 24px rgba(239,68,68,0.3); }
-      50% { box-shadow: 0 4px 40px rgba(239,68,68,0.6); }
-    }
-
-    .diff-connector .arrow-down { font-size: 1.2rem; color: var(--onpe-red); font-weight: 900; }
-    .diff-connector-inner.close .arrow-down { color: #D97706; }
-    .diff-connector-inner.very-close .arrow-down { color: #DC2626; }
-
-    .diff-connector .diff-text { font-size: 0.85rem; font-weight: 800; color: var(--onpe-red); }
-    .diff-connector-inner.close .diff-text { color: #D97706; }
-    .diff-connector-inner.very-close .diff-text { color: #DC2626; }
-
-    .diff-connector .diff-pct-text { font-size: 0.7rem; font-weight: 600; color: var(--gray-500); }
-    .diff-connector .diff-label-text { font-size: 0.55rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.3px; color: var(--gray-400); }
-
-    .rest-section { margin-top: 2rem; }
-
+    /* ── Rest Section ────────────────────────────────────────────── */
+    .rest-section { margin-top: 0; }
     .rest-title { font-size: 0.85rem; font-weight: 700; color: var(--gray-600); margin-bottom: 0.75rem; padding-bottom: 0.5rem; border-bottom: 2px solid var(--gray-200); }
 
     .rest-grid {
@@ -217,56 +282,128 @@
       gap: 0; background: white; border-radius: 12px;
       border: 1px solid var(--gray-200); overflow: hidden;
     }
-
     .rest-header { display: contents; }
     .rest-header > div { padding: 0.6rem 0.75rem; background: var(--gray-100); font-size: 0.6rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--gray-500); border-bottom: 1px solid var(--gray-200); }
-
     .rest-row { display: contents; }
     .rest-row > div { padding: 0.5rem 0.75rem; border-bottom: 1px solid var(--gray-100); display: flex; align-items: center; }
     .rest-row:last-child > div { border-bottom: none; }
-
     .rest-rank { font-size: 0.75rem; font-weight: 800; color: var(--gray-400); }
-
     .rest-photo { width: 32px; height: 32px; border-radius: 8px; object-fit: cover; background: var(--gray-200); }
-
     .rest-info { flex-direction: column; align-items: flex-start !important; }
     .rest-name { font-size: 0.72rem; font-weight: 600; color: var(--gray-800); }
     .rest-party { font-size: 0.58rem; color: var(--gray-500); }
     .rest-votes { font-size: 0.72rem; font-weight: 700; color: var(--gray-700); justify-content: flex-end !important; }
     .rest-pct { font-size: 0.75rem; font-weight: 800; color: var(--gray-600); justify-content: flex-end !important; }
 
+    /* ── Existing: geo, visitas, share, voltereta ────────────────── */
+    .voltereta-banner { display: flex; align-items: center; gap: 1rem; padding: 1rem 1.5rem; border-radius: 16px; margin-bottom: 2rem; border: 2px solid; }
+    .voltereta-icon { font-size: 1.8rem; flex-shrink: 0; }
+    .voltereta-body { flex: 1; min-width: 0; }
+    .voltereta-status { font-size: 1rem; font-weight: 900; letter-spacing: 0.5px; }
+    .voltereta-detail { font-size: 0.75rem; font-weight: 500; color: var(--gray-600); margin-top: 2px; }
+    .voltereta-progress { flex-shrink: 0; min-width: 120px; }
+    .voltereta-progress-label { font-size: 0.65rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.3px; color: var(--gray-500); margin-bottom: 4px; }
+    .voltereta-progress-bar { height: 8px; background: var(--gray-200); border-radius: 4px; overflow: hidden; }
+    .voltereta-progress-fill { height: 100%; border-radius: 4px; transition: width 1s ease-out; }
+    .voltereta-danger { border-color: #EF4444; background: #FEF2F2; animation: voltereta-pulse 1.5s ease-in-out infinite; }
+    .voltereta-danger .voltereta-icon { color: #DC2626; }
+    .voltereta-danger .voltereta-status { color: #DC2626; }
+    .voltereta-danger .voltereta-progress-fill { background: linear-gradient(90deg, #EF4444, #DC2626); }
+    @keyframes voltereta-pulse { 0%,100%{box-shadow:0 0 0 0 rgba(239,68,68,0)} 50%{box-shadow:0 0 20px 4px rgba(239,68,68,0.3)} }
+    @media (prefers-reduced-motion: reduce) {
+      .voltereta-danger { animation: none; }
+    }
+    .voltereta-warning { border-color: #F59E0B; background: #FFFBEB; }
+    .voltereta-warning .voltereta-icon { color: #D97706; }
+    .voltereta-warning .voltereta-status { color: #D97706; }
+    .voltereta-warning .voltereta-progress-fill { background: linear-gradient(90deg, #F59E0B, #D97706); }
+    .voltereta-safe { border-color: #22C55E; background: #F0FDF4; }
+    .voltereta-safe .voltereta-icon { color: #16A34A; }
+    .voltereta-safe .voltereta-status { color: #16A34A; }
+    .voltereta-safe .voltereta-progress-fill { background: linear-gradient(90deg, #22C55E, #16A34A); }
+
+    .geo-section { margin-top: 2rem; }
+    .geo-title { font-size: 1rem; font-weight: 700; color: var(--gray-800); margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem; }
+    .geo-title::before { content: ''; width: 4px; height: 18px; background: var(--onpe-blue); border-radius: 2px; }
+    .geo-depto-select { margin-bottom: 1rem; }
+    .geo-depto-select select { width: 100%; max-width: 360px; padding: 0.6rem 1rem; border: 2px solid var(--gray-200); border-radius: 10px; font-family: inherit; font-size: 0.85rem; font-weight: 500; background: white; color: var(--gray-800); cursor: pointer; transition: border-color 0.2s; }
+    .geo-depto-select select:focus { border-color: var(--onpe-blue); outline: none; }
+    .geo-depto-select select:focus-visible { outline: 3px solid var(--onpe-blue); outline-offset: 2px; }
+    .geo-table { background: white; border-radius: 14px; border: 1px solid var(--gray-200); overflow: hidden; }
+    .geo-table-header { display: grid; grid-template-columns: 1fr 1.2fr 1fr 1fr 90px; padding: 0.7rem 1rem; background: var(--gray-100); font-size: 0.6rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--gray-500); border-bottom: 1px solid var(--gray-200); }
+    .geo-row { display: grid; grid-template-columns: 1fr 1.2fr 1fr 1fr 90px; padding: 0.65rem 1rem; border-bottom: 1px solid var(--gray-100); align-items: center; cursor: pointer; transition: background 0.15s; }
+    .geo-row:hover { background: var(--gray-50); }
+    .geo-row:last-child { border-bottom: none; }
+    .geo-row-danger { border-left: 3px solid #EF4444; }
+    .geo-row-warning { border-left: 3px solid #F59E0B; }
+    .geo-depto-name { font-size: 0.72rem; font-weight: 700; color: var(--gray-800); }
+    .geo-winner { display: flex; align-items: center; gap: 0.5rem; }
+    .geo-winner-photo { width: 26px; height: 26px; border-radius: 7px; object-fit: cover; background: var(--gray-200); }
+    .geo-winner-name { font-size: 0.68rem; font-weight: 600; color: var(--onpe-red); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .geo-winner-pct { font-size: 0.62rem; font-weight: 700; color: var(--onpe-red); }
+    .geo-2nd-name, .geo-3rd-name { font-size: 0.68rem; font-weight: 500; color: var(--gray-700); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .geo-2nd-pct, .geo-3rd-pct { font-size: 0.62rem; font-weight: 600; color: var(--gray-500); }
+    .geo-diff { font-size: 0.72rem; font-weight: 700; color: var(--gray-700); text-align: right; }
+    .geo-row-danger .geo-diff { color: #DC2626; }
+    .geo-row-warning .geo-diff { color: #D97706; }
+    .geo-back-btn { display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.4rem 1rem; margin-bottom: 1rem; background: var(--gray-100); border: 1px solid var(--gray-200); border-radius: 8px; font-family: inherit; font-size: 0.75rem; font-weight: 600; color: var(--gray-600); cursor: pointer; transition: background 0.2s, color 0.2s; }
+    .geo-back-btn:hover { background: var(--gray-200); color: var(--gray-800); }
+    .geo-back-btn:focus-visible { outline: 3px solid var(--onpe-blue); outline-offset: 2px; }
+
+    .visitas-widget { display: flex; align-items: center; gap: 1.5rem; padding: 1rem 1.5rem; border-radius: 14px; background: white; border: 1px solid var(--gray-200); margin-top: 2rem; }
+    .visitas-count { display: flex; flex-direction: column; align-items: center; flex-shrink: 0; padding-right: 1.5rem; border-right: 1px solid var(--gray-200); }
+    .visitas-number { font-size: 1.6rem; font-weight: 900; color: var(--onpe-blue); line-height: 1; }
+    .visitas-label { font-size: 0.65rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: var(--gray-500); margin-top: 2px; }
+    .visitas-countries { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+    .visitas-country { display: flex; align-items: center; gap: 0.35rem; padding: 0.3rem 0.7rem; border-radius: 20px; background: var(--gray-100); font-size: 0.75rem; }
+    .visitas-flag { font-size: 1rem; }
+    .visitas-country-name { font-weight: 600; color: var(--gray-700); }
+    .visitas-country-count { font-weight: 800; color: var(--onpe-blue); margin-left: 0.2rem; }
+
+    .share-bar { display: flex; gap: 0.4rem; flex-wrap: wrap; margin-bottom: 1.5rem; }
+    .share-btn {
+      padding: 0.45rem 0.9rem; border-radius: 8px;
+      border: 1.5px solid rgba(255,255,255,0.1);
+      font-family: 'Space Grotesk', sans-serif; font-size: 0.72rem; font-weight: 600;
+      cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 0.35rem;
+      transition: all 0.2s; background: #0a0a0a; color: rgba(255,255,255,0.6);
+    }
+    .share-btn:hover { color: white; border-color: rgba(255,255,255,0.3); transform: translateY(-1px); }
+    .share-btn:focus-visible { outline: 3px solid var(--onpe-blue); outline-offset: 2px; }
+    .share-copy:hover { border-color: rgba(255,255,255,0.5); background: rgba(255,255,255,0.08); }
+    .share-wa:hover { border-color: #25D367; color: #25D367; background: rgba(37,211,102,0.1); }
+    .share-tw:hover { border-color: #1DA1F2; color: #1DA1F2; background: rgba(29,161,242,0.1); }
+    .share-img:hover { border-color: #C41E3A; color: #C41E3A; background: rgba(196,30,58,0.1); }
+
+    /* ── Responsive ──────────────────────────────────────────────── */
+    @media (max-width: 768px) {
+      .duel-hero-grid { grid-template-columns: 1fr; gap: 1rem; }
+      .duel-hero-vs { flex-direction: row; padding: 0.5rem 0; }
+      .dhvs-circle { width: 40px; height: 40px; font-size: 1rem; }
+      .dhvs-gap { display: flex; align-items: center; gap: 0.5rem; margin-top: 0; }
+      .dhvs-gap-value { font-size: 1rem; }
+      .dhc-pct { font-size: 2rem; }
+      .dhc-photo { width: 64px; height: 64px; }
+      .first-strip { flex-wrap: wrap; }
+      .fs-pct { font-size: 1.3rem; }
+    }
     @media (max-width: 640px) {
-      .candidate-card { padding: 1rem; }
-      .card-main { flex-wrap: wrap; }
-      .card-photo { width: 60px !important; height: 60px !important; }
-      .card-identity { flex: 1; min-width: 0; }
-      .card-name { font-size: 0.95rem !important; }
-      .card-pct-wrap { flex: 0 0 auto; }
-      .card-pct { font-size: 1.6rem !important; }
-      .rank-1 .card-pct { font-size: 2rem !important; }
-      .card-stats { flex-direction: column; gap: 0.75rem; }
-      .card-diff-block { text-align: left; min-width: unset; width: 100%; }
-      .card-diff-value { font-size: 1.2rem; }
-      .diff-connector { height: 48px; }
-      .diff-connector-inner { padding: 0.4rem 1rem; gap: 0.5rem; }
-      .diff-connector .diff-text { font-size: 0.75rem; }
-      .diff-connector .diff-label-text { font-size: 0.5rem; }
-      .card-party { flex-wrap: wrap; }
-      .card-party-logo { display: none; }
-
-      .rest-grid { display: flex; flex-direction: column; gap: 0; border: none; border-radius: 0; background: none; }
-      .rest-header { display: none; }
-      .rest-row { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; padding: 0.6rem 0.5rem; border-bottom: 1px solid var(--gray-200); background: white; }
-      .rest-row > div { border-bottom: none; padding: 0; }
-      .rest-rank { font-size: 0.75rem; width: 24px; }
-      .rest-photo { width: 32px; height: 32px; border-radius: 6px; }
-      .rest-info { flex: 1; min-width: 0; flex-direction: column; align-items: flex-start !important; }
-      .rest-name { font-size: 0.75rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-      .rest-party { display: none; }
-      .rest-votes { font-size: 0.7rem; }
-      .rest-pct { font-size: 0.8rem; }
-
+      .ticker-text { font-size: 0.72rem; }
+      .duel-hero { padding: 1.25rem 1rem 1rem; }
+      .dhc-photo { width: 56px; height: 56px; }
+      .dhc-name { font-size: 0.85rem; }
+      .dhc-pct { font-size: 1.8rem; }
+      .dhvs-circle { width: 36px; height: 36px; font-size: 0.9rem; }
+      .first-strip { padding: 0.75rem 1rem; }
+      .fs-photo { width: 36px; height: 36px; }
+      .fs-name { font-size: 0.82rem; }
+      .fs-pct { font-size: 1.1rem; }
+      .visitas-widget { flex-direction: column; align-items: flex-start; gap: 0.75rem; }
+      .visitas-count { border-right: none; padding-right: 0; border-bottom: 1px solid var(--gray-200); padding-bottom: 0.5rem; width: 100%; flex-direction: row; justify-content: center; gap: 0.5rem; }
+      .share-bar { gap: 0.4rem; }
+      .share-btn { font-size: 0.68rem; padding: 0.4rem 0.7rem; }
       .geo-table-header { display: none; }
+      .geo-table { border: none; border-radius: 0; }
       .geo-row { display: flex; flex-wrap: wrap; align-items: center; gap: 0.4rem 0.6rem; padding: 0.6rem 0.5rem; font-size: 0.75rem; }
       .geo-row > div { padding: 0; }
       .geo-depto-name { font-size: 0.8rem; font-weight: 700; flex: 0 0 100%; }
@@ -277,175 +414,29 @@
       .geo-2nd, .geo-3rd { font-size: 0.65rem; }
       .geo-diff { font-size: 0.7rem; margin-left: auto; }
       .geo-depto-select select { max-width: 100%; }
-    }
-
-    .voltereta-banner {
-      display: flex; align-items: center; gap: 1rem;
-      padding: 1rem 1.5rem; border-radius: 16px;
-      margin-bottom: 2rem; border: 2px solid;
-    }
-
-    .voltereta-icon { font-size: 1.8rem; flex-shrink: 0; }
-
-    .voltereta-body { flex: 1; min-width: 0; }
-
-    .voltereta-status { font-size: 1rem; font-weight: 900; letter-spacing: 0.5px; }
-
-    .voltereta-detail { font-size: 0.75rem; font-weight: 500; color: var(--gray-600); margin-top: 2px; }
-
-    .voltereta-progress { flex-shrink: 0; min-width: 120px; }
-
-    .voltereta-progress-label { font-size: 0.65rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.3px; color: var(--gray-500); margin-bottom: 4px; }
-
-    .voltereta-progress-bar { height: 8px; background: var(--gray-200); border-radius: 4px; overflow: hidden; }
-    .voltereta-progress-fill { height: 100%; border-radius: 4px; transition: width 1s ease-out; }
-
-    .voltereta-danger {
-      border-color: #EF4444; background: #FEF2F2;
-      animation: voltereta-pulse 1.5s ease-in-out infinite;
-    }
-    .voltereta-danger .voltereta-icon { color: #DC2626; }
-    .voltereta-danger .voltereta-status { color: #DC2626; }
-    .voltereta-danger .voltereta-progress-fill { background: linear-gradient(90deg, #EF4444, #DC2626); }
-
-    @keyframes voltereta-pulse {
-      0%,100% { box-shadow: 0 0 0 0 rgba(239,68,68,0); }
-      50% { box-shadow: 0 0 20px 4px rgba(239,68,68,0.3); }
-    }
-
-    .voltereta-warning {
-      border-color: #F59E0B; background: #FFFBEB;
-    }
-    .voltereta-warning .voltereta-icon { color: #D97706; }
-    .voltereta-warning .voltereta-status { color: #D97706; }
-    .voltereta-warning .voltereta-progress-fill { background: linear-gradient(90deg, #F59E0B, #D97706); }
-
-    .voltereta-safe {
-      border-color: #22C55E; background: #F0FDF4;
-    }
-    .voltereta-safe .voltereta-icon { color: #16A34A; }
-    .voltereta-safe .voltereta-status { color: #16A34A; }
-    .voltereta-safe .voltereta-progress-fill { background: linear-gradient(90deg, #22C55E, #16A34A); }
-
-    @media (max-width: 640px) {
-      .voltereta-banner { flex-direction: column; align-items: flex-start; gap: 0.75rem; padding: 1rem; }
-      .voltereta-progress { min-width: 100%; }
-    }
-
-    .geo-section { margin-top: 2rem; }
-
-    .geo-title {
-      font-size: 1rem; font-weight: 700; color: var(--gray-800); margin-bottom: 1rem;
-      display: flex; align-items: center; gap: 0.5rem;
-    }
-    .geo-title::before { content: ''; width: 4px; height: 18px; background: var(--onpe-blue); border-radius: 2px; }
-
-    .geo-depto-select { margin-bottom: 1rem; }
-    .geo-depto-select select {
-      width: 100%; max-width: 360px; padding: 0.6rem 1rem;
-      border: 2px solid var(--gray-200); border-radius: 10px;
-      font-family: inherit; font-size: 0.85rem; font-weight: 500;
-      background: white; color: var(--gray-800); cursor: pointer;
-      transition: border-color 0.2s;
-    }
-    .geo-depto-select select:focus { border-color: var(--onpe-blue); outline: none; }
-
-    .geo-table { background: white; border-radius: 14px; border: 1px solid var(--gray-200); overflow: hidden; }
-
-    .geo-table-header {
-      display: grid; grid-template-columns: 1fr 1.2fr 1fr 1fr 90px;
-      padding: 0.7rem 1rem; background: var(--gray-100);
-      font-size: 0.6rem; font-weight: 700; text-transform: uppercase;
-      letter-spacing: 0.5px; color: var(--gray-500);
-      border-bottom: 1px solid var(--gray-200);
-    }
-
-    .geo-row {
-      display: grid; grid-template-columns: 1fr 1.2fr 1fr 1fr 90px;
-      padding: 0.65rem 1rem; border-bottom: 1px solid var(--gray-100);
-      align-items: center; cursor: pointer; transition: background 0.15s;
-    }
-    .geo-row:hover { background: var(--gray-50); }
-    .geo-row:last-child { border-bottom: none; }
-
-    .geo-row-danger { border-left: 3px solid #EF4444; }
-    .geo-row-warning { border-left: 3px solid #F59E0B; }
-
-    .geo-depto-name { font-size: 0.72rem; font-weight: 700; color: var(--gray-800); }
-
-    .geo-winner { display: flex; align-items: center; gap: 0.5rem; }
-    .geo-winner-photo { width: 26px; height: 26px; border-radius: 7px; object-fit: cover; background: var(--gray-200); }
-    .geo-winner-name { font-size: 0.68rem; font-weight: 600; color: var(--onpe-red); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .geo-winner-pct { font-size: 0.62rem; font-weight: 700; color: var(--onpe-red); }
-
-    .geo-2nd-name, .geo-3rd-name { font-size: 0.68rem; font-weight: 500; color: var(--gray-700); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .geo-2nd-pct, .geo-3rd-pct { font-size: 0.62rem; font-weight: 600; color: var(--gray-500); }
-
-    .geo-diff { font-size: 0.72rem; font-weight: 700; color: var(--gray-700); text-align: right; }
-    .geo-row-danger .geo-diff { color: #DC2626; }
-    .geo-row-warning .geo-diff { color: #D97706; }
-
-    .geo-back-btn {
-      display: inline-flex; align-items: center; gap: 0.4rem;
-      padding: 0.4rem 1rem; margin-bottom: 1rem;
-      background: var(--gray-100); border: 1px solid var(--gray-200);
-      border-radius: 8px; font-family: inherit; font-size: 0.75rem;
-      font-weight: 600; color: var(--gray-600); cursor: pointer;
-      transition: all 0.2s;
-    }
-    .geo-back-btn:hover { background: var(--gray-200); color: var(--gray-800); }
-
-    .visitas-widget {
-      display: flex; align-items: center; gap: 1.5rem;
-      padding: 1rem 1.5rem; border-radius: 14px;
-      background: white; border: 1px solid var(--gray-200);
-      margin-top: 2rem;
-    }
-
-    .visitas-count { display: flex; flex-direction: column; align-items: center; flex-shrink: 0; padding-right: 1.5rem; border-right: 1px solid var(--gray-200); }
-
-    .visitas-number { font-size: 1.6rem; font-weight: 900; color: var(--onpe-blue); line-height: 1; }
-    .visitas-label { font-size: 0.65rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: var(--gray-500); margin-top: 2px; }
-
-    .visitas-countries { display: flex; flex-wrap: wrap; gap: 0.5rem; }
-
-    .visitas-country {
-      display: flex; align-items: center; gap: 0.35rem;
-      padding: 0.3rem 0.7rem; border-radius: 20px;
-      background: var(--gray-100); font-size: 0.75rem;
-    }
-
-    .visitas-flag { font-size: 1rem; }
-    .visitas-country-name { font-weight: 600; color: var(--gray-700); }
-    .visitas-country-count { font-weight: 800; color: var(--onpe-blue); margin-left: 0.2rem; }
-
-    .share-bar {
-      display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1.5rem;
-    }
-
-    .share-btn {
-      padding: 0.5rem 1rem; border-radius: 10px; border: 1px solid var(--gray-200);
-      font-family: inherit; font-size: 0.75rem; font-weight: 600;
-      cursor: pointer; text-decoration: none; display: inline-flex;
-      align-items: center; gap: 0.3rem; transition: all 0.15s;
-      background: white; color: var(--gray-700);
-    }
-
-    .share-btn:hover { background: var(--gray-100); }
-    .share-copy:hover { background: #EFF6FF; border-color: #3B82F6; color: #2563EB; }
-    .share-wa:hover { background: #F0FDF4; border-color: #22C55E; color: #16A34A; }
-    .share-tw:hover { background: #EFF6FF; border-color: #1DA1F2; color: #1DA1F2; }
-    .share-img:hover { background: #FEF2F2; border-color: #EF4444; color: #DC2626; }
-
-    @media (max-width: 640px) {
-      .visitas-widget { flex-direction: column; align-items: flex-start; gap: 0.75rem; }
-      .visitas-count { border-right: none; padding-right: 0; border-bottom: 1px solid var(--gray-200); padding-bottom: 0.5rem; width: 100%; flex-direction: row; justify-content: center; gap: 0.5rem; }
-      .share-bar { gap: 0.4rem; }
-      .share-btn { font-size: 0.68rem; padding: 0.4rem 0.7rem; }
+      .rest-grid { display: flex; flex-direction: column; gap: 0; border: none; border-radius: 0; background: none; }
+      .rest-header { display: none; }
+      .rest-row { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; padding: 0.6rem 0.5rem; border-bottom: 1px solid var(--gray-200); background: white; }
+      .rest-row > div { padding: 0; }
+      .rest-rank { font-size: 0.75rem; width: 24px; }
+      .rest-photo { width: 32px; height: 32px; border-radius: 6px; }
+      .rest-info { flex: 1; min-width: 0; }
+      .rest-name { font-size: 0.75rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+      .rest-party { display: none; }
+      .rest-votes { font-size: 0.7rem; }
+      .rest-pct { font-size: 0.8rem; }
     }
   </style>
 </head>
 <body>
+  <!-- Section 1: Ticker Alert Bar -->
+  <div class="ticker-bar">
+    <div class="ticker-badge">EN VIVO</div>
+    <div class="ticker-scroll">
+      <div class="ticker-text" id="ticker-text"></div>
+    </div>
+  </div>
+
   <header class="app-header" id="app-header"></header>
 
   <div class="app-container">
@@ -461,13 +452,31 @@
     </div>
 
     <div id="app-content" style="display:none">
+      <!-- CTA Pill -->
+      <div class="cta-pill" id="cta-pill"></div>
+
+      <!-- Scope tabs -->
       <div id="scope-tabs"></div>
+
+      <!-- Mini stats -->
       <div class="mini-stats-row" id="summary-row"></div>
+
+      <!-- Voltereta -->
       <div id="voltereta-section"></div>
+
+      <!-- Section 2: Duel Cards -->
+      <section class="duel-section" id="duel-section"></section>
+
+      <!-- Share bar -->
       <div id="share-section"></div>
-      <div id="top3-section"></div>
+
+      <!-- Rest of candidates -->
       <div class="rest-section" id="rest-section"></div>
+
+      <!-- Geo section -->
       <div id="geo-section"></div>
+
+      <!-- Visitas -->
       <div id="visitas-section"></div>
     </div>
   </div>
@@ -483,89 +492,100 @@
   <script type="module">
     import { fetchAllData, renderHeader, renderScopeTabs, renderMiniStats, renderVoltereta, renderGeoSection, renderVisitas, renderShareBar, getList, getTotales, fmt, fmtPct, fmtPctShort, fmtDiff, fmtDate, photoUrl, partyLogoUrl, setScope, getScope, setSelectedDepto, getSelectedDepto, fetchDeptoResultados } from '/app.js';
 
-    function getConnectorCls(diff) {
-      if (diff < 10000) return 'very-close';
-      if (diff < 500000) return 'close';
-      return '';
+    function renderTicker(list, t) {
+      if (!list.length || !t) return;
+      const sorted = [...list].sort((a, b) => (b.porcentajeVotosValidos || 0) - (a.porcentajeVotosValidos || 0));
+      const top3 = sorted.slice(0, 3);
+      const pct = Number(t.actasContabilizadas) || 0;
+      const items = [
+        `<span>Resultados ONPE act</span>`,
+        `${top3.map(c => `<span class="t-highlight">${c.nombreCandidato?.split(' ').slice(0,2).join(' ')}</span> <span class="t-pct">${fmtPctShort(c.porcentajeVotosValidos)}%</span>`).join('<span class="t-dot">•</span>')}`,
+        `<span>${fmtPctShort(pct)}% contabilizado</span>`,
+        `<span class="t-highlight">${fmt(t.totalVotosEmitidos)}</span> <span class="t-pct">votos emitidos</span>`,
+      ];
+      const text = items.join('');
+      const el = document.getElementById('ticker-text');
+      if (el) el.innerHTML = text + ' ' + text;
+    }
+
+    function renderCTA() {
+      const el = document.getElementById('cta-pill');
+      el.innerHTML = `<a href="/proyecciones.html" class="cta-pill-inner"><svg viewBox="0 0 24 24"><path d="M13 7h-2v4H7v2h4v4h2v-4h4v-2h-4V7zm-1-5C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/></svg>Puede cambiar el 2do o 3er lugar? Mira las proyecciones…</a>`;
     }
 
     function renderTop3() {
       const list = getList();
       const sorted = [...list].sort((a, b) => (b.porcentajeVotosValidos || 0) - (a.porcentajeVotosValidos || 0));
       const top3 = sorted.slice(0, 3);
-      const maxPct = top3[0]?.porcentajeVotosValidos || 1;
-      if (!top3.length) { document.getElementById('top3-section').innerHTML = ''; return; }
+      if (!top3.length) { document.getElementById('duel-section').innerHTML = ''; return; }
 
-      const ranks = ['rank-1', 'rank-2', 'rank-3'];
-      let html = '<div class="top3-list">';
+      const first = top3[0];
+      const second = top3[1];
+      const third = top3[2];
 
-      top3.forEach((c, i) => {
-        const pct = c.porcentajeVotosValidos || 0;
-        const barW = maxPct > 0 ? (pct / maxPct * 100) : 0;
-        const diff = i > 0 ? (top3[i - 1].totalVotosValidos - c.totalVotosValidos) : null;
-        const diffPct = i > 0 ? (top3[i - 1].porcentajeVotosValidos - pct) : null;
-        const leadOver2nd = i === 0 && top3[1] ? (c.totalVotosValidos - top3[1].totalVotosValidos) : null;
-        const leadPct = i === 0 && top3[1] ? (pct - top3[1].porcentajeVotosValidos) : null;
+      // HERO: 2nd vs 3rd is THE main event
+      let html = '';
+
+      if (second && third) {
+        const diff23 = second.totalVotosValidos - third.totalVotosValidos;
+        const diff23Pct = second.porcentajeVotosValidos - third.porcentajeVotosValidos;
+        const isClose = Math.abs(diff23Pct) < 2;
+        const secondPctShared = second.porcentajeVotosValidos + third.porcentajeVotosValidos > 0
+          ? (second.porcentajeVotosValidos / (second.porcentajeVotosValidos + third.porcentajeVotosValidos) * 100) : 50;
+        const thirdPctShared = 100 - secondPctShared;
 
         html += `
-          <div class="candidate-card ${ranks[i]}">
-            <div class="card-main">
-              <div class="card-photo-wrap">
-                <img class="card-photo" src="${photoUrl(c.dniCandidato)}" alt="${c.nombreCandidato}" onerror="this.style.display='none'">
-                <div class="card-photo-rank">${i + 1}</div>
-              </div>
-              <div class="card-identity">
-                <div class="card-name">${c.nombreCandidato || c.nombreAgrupacionPolitica}</div>
-                <div class="card-party">
-                  ${c.nombreAgrupacionPolitica}
-                  <img class="card-party-logo" src="${partyLogoUrl(c.codigoAgrupacionPolitica)}" alt="" onerror="this.style.display='none'">
-                </div>
-              </div>
-              <div class="card-pct-wrap">
-                <div class="card-pct">${fmtPctShort(pct)}</div>
-                <div class="card-pct-label">% validos</div>
+        <div class="duel-hero ${isClose ? 'duel-hero-close' : ''}">
+          <div class="duel-hero-label">${isClose ? '&#128293; PELEA CERRADA' : 'La pelea por el 2do lugar'}</div>
+          <div class="duel-hero-grid">
+            <div class="duel-hero-card duel-hero-card-2">
+              <div class="dhc-badge">2do</div>
+              <img class="dhc-photo" src="${photoUrl(second.dniCandidato)}" alt="" onerror="this.style.display='none'">
+              <img class="dhc-party-logo" src="${partyLogoUrl(second.codigoAgrupacionPolitica)}" alt="" onerror="this.style.display='none'">
+              <div class="dhc-name">${second.nombreCandidato || second.nombreAgrupacionPolitica}</div>
+              <div class="dhc-party">${second.nombreAgrupacionPolitica}</div>
+              <div class="dhc-pct">${fmtPctShort(second.porcentajeVotosValidos)}</div>
+              <div class="dhc-bar-track"><div class="dhc-bar-fill dhc-bar-silver" style="width:${secondPctShared}%"></div></div>
+              <div class="dhc-votes">${fmt(second.totalVotosValidos)} votos</div>
+            </div>
+
+            <div class="duel-hero-vs">
+              <div class="dhvs-circle">VS</div>
+              <div class="dhvs-gap">
+                <div class="dhvs-gap-value">${fmtDiff(diff23)}</div>
+                <div class="dhvs-gap-label">votos de diferencia</div>
+                <div class="dhvs-gap-pct">${fmtPct(Math.abs(diff23Pct))} pts</div>
               </div>
             </div>
-            <div class="card-stats">
-              <div class="card-votes-block">
-                <div class="card-votes-label">Votos totales</div>
-                <div class="card-votes-total">${fmt(c.totalVotosValidos)}</div>
-                <div class="card-bar-track"><div class="card-bar-fill" style="width:${barW}%"></div></div>
-              </div>
-              <div class="card-diff-block">
-                ${i === 0 ? `
-                  <div class="card-diff-label">Ventaja sobre 2.do</div>
-                  <div class="card-diff-value">${leadOver2nd != null ? fmtDiff(leadOver2nd) : '-'}</div>
-                  <div class="card-diff-pct">${leadPct != null ? fmtPct(leadPct) + ' pts' : ''}</div>
-                ` : `
-                  <div class="card-diff-label">Diferencia con ${i}.er lugar</div>
-                  <div class="card-diff-value"><span class="diff-arrow">&#9660;</span>${fmtDiff(diff)}</div>
-                  <div class="card-diff-pct">${fmtPct(diffPct)} pts</div>
-                `}
-              </div>
+
+            <div class="duel-hero-card duel-hero-card-3">
+              <div class="dhc-badge">3ro</div>
+              <img class="dhc-photo" src="${photoUrl(third.dniCandidato)}" alt="" onerror="this.style.display='none'">
+              <img class="dhc-party-logo" src="${partyLogoUrl(third.codigoAgrupacionPolitica)}" alt="" onerror="this.style.display='none'">
+              <div class="dhc-name">${third.nombreCandidato || third.nombreAgrupacionPolitica}</div>
+              <div class="dhc-party">${third.nombreAgrupacionPolitica}</div>
+              <div class="dhc-pct">${fmtPctShort(third.porcentajeVotosValidos)}</div>
+              <div class="dhc-bar-track"><div class="dhc-bar-fill dhc-bar-bronze" style="width:${thirdPctShared}%"></div></div>
+              <div class="dhc-votes">${fmt(third.totalVotosValidos)} votos</div>
             </div>
-          </div>`;
+          </div>
+        </div>`;
+      }
 
-        if (i < top3.length - 1) {
-          const nextDiff = c.totalVotosValidos - (top3[i + 1]?.totalVotosValidos || 0);
-          const nextDiffPct = pct - (top3[i + 1]?.porcentajeVotosValidos || 0);
-          const cls = getConnectorCls(nextDiff);
-          html += `
-            <div class="diff-connector">
-              <div class="diff-connector-inner ${cls}">
-                <span class="arrow-down">&#9660;</span>
-                <div>
-                  <div class="diff-label-text">Diferencia ${i + 1}er vs ${i + 2}do</div>
-                  <div class="diff-text">${fmtDiff(nextDiff)} votos</div>
-                  <div class="diff-pct-text">${fmtPct(nextDiffPct)} puntos</div>
-                </div>
-              </div>
-            </div>`;
-        }
-      });
+      // 1st place: compact strip below
+      html += `
+      <div class="first-strip">
+        <div class="fs-rank">1</div>
+        <img class="fs-photo" src="${photoUrl(first.dniCandidato)}" alt="" onerror="this.style.display='none'">
+        <div class="fs-info">
+          <div class="fs-name">${first.nombreCandidato || first.nombreAgrupacionPolitica}</div>
+          <div class="fs-party">${first.nombreAgrupacionPolitica} · ${fmt(first.totalVotosValidos)} votos</div>
+        </div>
+        <div class="fs-pct">${fmtPctShort(first.porcentajeVotosValidos)}</div>
+        ${second ? `<div class="fs-lead">&#9650; ${fmtPct(first.porcentajeVotosValidos - second.porcentajeVotosValidos)} pts de ventaja</div>` : ''}
+      </div>`;
 
-      html += '</div>';
-      document.getElementById('top3-section').innerHTML = html;
+      document.getElementById('duel-section').innerHTML = html;
     }
 
     function renderRest() {
@@ -592,109 +612,34 @@
     }
 
     function renderAll() {
+      const list = getList();
+      const t = getTotales();
       renderHeader();
+      renderTicker(list, t);
+      renderCTA();
       renderScopeTabs('scope-tabs', () => { setSelectedDepto(null); renderAll(); });
-      renderMiniStats('summary-row', getTotales());
-      renderVoltereta('voltereta-section', getList(), getTotales());
-      renderShareBar('share-section', getList());
+      renderMiniStats('summary-row', t);
+      renderVoltereta('voltereta-section', list, t);
       renderTop3();
+      renderShareBar('share-section', list);
       renderRest();
       renderGeoSection('geo-section', handleDeptoSelect);
       renderVisitas('visitas-section');
     }
 
     async function handleDeptoSelect(ubigeo) {
-      if (!ubigeo) {
-        setSelectedDepto(null);
-        renderAll();
-        return;
-      }
+      if (!ubigeo) { setSelectedDepto(null); renderAll(); return; }
       const list = await fetchDeptoResultados(ubigeo);
       const candidates = list.filter(c => c.dniCandidato && c.nombreCandidato);
       const sorted = [...candidates].sort((a, b) => (b.porcentajeVotosValidos || 0) - (a.porcentajeVotosValidos || 0));
       const top3 = sorted.slice(0, 3);
-      const maxPct = top3[0]?.porcentajeVotosValidos || 1;
       const deptoName = document.getElementById('geo-depto-dropdown')?.selectedOptions[0]?.text || '';
 
-      const ranks = ['rank-1', 'rank-2', 'rank-3'];
-      let html = `<button class="geo-back-btn" id="geo-back">&#8592; Ver Nacional</button>`;
-      html += '<div class="top3-list">';
-
-      top3.forEach((c, i) => {
-        const pct = c.porcentajeVotosValidos || 0;
-        const barW = maxPct > 0 ? (pct / maxPct * 100) : 0;
-        const diff = i > 0 ? (top3[i - 1].totalVotosValidos - c.totalVotosValidos) : null;
-        const diffPct = i > 0 ? (top3[i - 1].porcentajeVotosValidos - pct) : null;
-        const leadOver2nd = i === 0 && top3[1] ? (c.totalVotosValidos - top3[1].totalVotosValidos) : null;
-        const leadPct = i === 0 && top3[1] ? (pct - top3[1].porcentajeVotosValidos) : null;
-
-        html += `
-          <div class="candidate-card ${ranks[i]}">
-            <div class="card-main">
-              <div class="card-photo-wrap">
-                <img class="card-photo" src="${photoUrl(c.dniCandidato)}" alt="${c.nombreCandidato}" onerror="this.style.display='none'">
-                <div class="card-photo-rank">${i + 1}</div>
-              </div>
-              <div class="card-identity">
-                <div class="card-name">${c.nombreCandidato || c.nombreAgrupacionPolitica}</div>
-                <div class="card-party">
-                  ${c.nombreAgrupacionPolitica}
-                  <img class="card-party-logo" src="${partyLogoUrl(c.codigoAgrupacionPolitica)}" alt="" onerror="this.style.display='none'">
-                </div>
-              </div>
-              <div class="card-pct-wrap">
-                <div class="card-pct">${fmtPctShort(pct)}</div>
-                <div class="card-pct-label">% validos</div>
-              </div>
-            </div>
-            <div class="card-stats">
-              <div class="card-votes-block">
-                <div class="card-votes-label">Votos totales</div>
-                <div class="card-votes-total">${fmt(c.totalVotosValidos)}</div>
-                <div class="card-bar-track"><div class="card-bar-fill" style="width:${barW}%"></div></div>
-              </div>
-              <div class="card-diff-block">
-                ${i === 0 ? `
-                  <div class="card-diff-label">Ventaja sobre 2.do</div>
-                  <div class="card-diff-value">${leadOver2nd != null ? fmtDiff(leadOver2nd) : '-'}</div>
-                  <div class="card-diff-pct">${leadPct != null ? fmtPct(leadPct) + ' pts' : ''}</div>
-                ` : `
-                  <div class="card-diff-label">Diferencia con ${i}.er lugar</div>
-                  <div class="card-diff-value"><span class="diff-arrow">&#9660;</span>${fmtDiff(diff)}</div>
-                  <div class="card-diff-pct">${fmtPct(diffPct)} pts</div>
-                `}
-              </div>
-            </div>
-          </div>`;
-
-        if (i < top3.length - 1) {
-          const nextDiff = c.totalVotosValidos - (top3[i + 1]?.totalVotosValidos || 0);
-          const nextDiffPct = pct - (top3[i + 1]?.porcentajeVotosValidos || 0);
-          const cls = getConnectorCls(nextDiff);
-          html += `
-            <div class="diff-connector">
-              <div class="diff-connector-inner ${cls}">
-                <span class="arrow-down">&#9660;</span>
-                <div>
-                  <div class="diff-label-text">Diferencia ${i + 1}er vs ${i + 2}do</div>
-                  <div class="diff-text">${fmtDiff(nextDiff)} votos</div>
-                  <div class="diff-pct-text">${fmtPct(nextDiffPct)} puntos</div>
-                </div>
-              </div>
-            </div>`;
-        }
-      });
-
-      html += '</div>';
-      const section = document.getElementById('top3-section');
-      section.innerHTML = `<div style="text-align:center;font-size:0.85rem;font-weight:700;color:var(--onpe-blue);margin-bottom:1rem">Resultados en ${deptoName}</div>` + html;
+      const section = document.getElementById('duel-section');
+      section.innerHTML = `<div style="text-align:center;font-size:0.85rem;font-weight:700;color:var(--onpe-blue);margin-bottom:1rem">Resultados en ${deptoName}</div>`;
       document.getElementById('rest-section').innerHTML = '';
 
-      document.getElementById('geo-back').addEventListener('click', () => {
-        setSelectedDepto(null);
-        document.getElementById('geo-depto-dropdown').value = '';
-        renderAll();
-      });
+      document.getElementById('geo-back')?.addEventListener('click', () => { setSelectedDepto(null); document.getElementById('geo-depto-dropdown').value = ''; renderAll(); });
     }
 
     async function init() {

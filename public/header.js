@@ -5,6 +5,7 @@ const HEADER_HTML = `
 </a>
 <nav class="nav-links">
   <a href="/" data-page="top3">Top 3</a>
+  <a href="/proyecciones.html" data-page="proyecciones">Proyecciones</a>
   <a href="/candidatos.html" data-page="candidatos">Candidatos</a>
   <a href="/resumen.html" data-page="resumen">Resumen</a>
   <div class="nav-update">
